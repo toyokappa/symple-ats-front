@@ -11,7 +11,7 @@
   )
     transition-group(class="inline-flex" type="transition" :name="!drag ? 'flip-list' : null")
       .bg-white.w-72.rounded.border.border-gray-200.mx-2(v-for="column in kanban" :key="column.id")
-        .bg-gray-100.px-3.py-2.flex.justify-content-start
+        .bg-gray-100.px-3.py-2.flex.justify-content-start.cursor-pointer
           h3.text-sm.mr-2 {{ column.name }}
           .text-sm.text-gray-500 {{ column.list.length }}
         .bg-white.p-3
@@ -26,7 +26,7 @@
             :emptyInsertThreshold="100"
             item-key="order"
           )
-            .bg-white.rounded.border.border-gray-200.shadow-sm.p-3.mb-2(v-for="item in column.list" :key="item.id")
+            .bg-white.rounded.border.border-gray-200.shadow-sm.p-3.mb-2.cursor-pointer(v-for="item in column.list" :key="item.id")
               .text-sm.mb-1(v-if="item.name") {{ item.name }}
               .text-sm.text-gray-400.mb-1(v-else) 名前未入力
               .flex.items-center.mb-1(v-if="item.recruiter")
