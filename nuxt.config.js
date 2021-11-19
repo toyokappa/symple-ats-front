@@ -9,7 +9,7 @@ export default {
   head: {
     title: 'symple-ats-front',
     htmlAttrs: {
-      lang: 'en'
+      lang: 'ja'
     },
     meta: [
       { charset: 'utf-8' },
@@ -27,6 +27,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '@/plugins/draggable'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -36,6 +37,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
+    '@nuxtjs/date-fns',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
