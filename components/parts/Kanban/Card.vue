@@ -16,7 +16,7 @@ draggable(
     parts-recruiter.mb-1(:recruiter="card.recruiter")
     parts-media(:mediaId="card.mediaId")
     .mb-1
-    parts-position(:position="card.position")
+    parts-position(:positionId="card.positionId")
     .mb-2
     parts-started-date(:date="card.startedDate")
 </template>

@@ -19,7 +19,7 @@
         .col-start-2.col-span-5
           parts-recruiter(v-if="currentCard.recruiter" :recruiter="currentCard.recruiter")
           .text-sm.text-gray-300(v-else) 未入力
-      .grid.grid-cols-6.mb-3.items-center
+      .grid.grid-cols-6.mb-2.items-center
         .text-sm 応募媒体
         .col-start-2.col-span-5
           v-select.text-sm.text-gray-300(
@@ -37,8 +37,18 @@
       .grid.grid-cols-6.mb-3.items-center
         .text-sm ポジション
         .col-start-2.col-span-5
-          parts-position(v-if="currentCard.position" :position="currentCard.position")
-          .text-sm.text-gray-300(v-else) 未入力
+          v-select.text-sm.text-gray-300(
+            v-model="currentCard.positionId"
+            placeholder="未入力"
+            :options="positionList"
+            :reduce="postion => postion.id"
+            label="name"
+            :class="'v-select-custom-style'"
+          )
+            template(#selected-option="option")
+              parts-position(:positionId="option.id")
+            template(v-slot:option="option")
+              parts-position(:positionId="option.id")
       .grid.grid-cols-6.mb-3.items-center
         .text-sm 選考開始日
         .col-start-2.col-span-5
@@ -61,10 +71,7 @@ export default {
               name: "toyokawa",
             },
             mediaId: 1,
-            position: {
-              name: "エンジニア",
-              color: "blue",
-            },
+            positionId: 1,
             startedDate: "2021.11.01",
           },
           {
@@ -75,10 +82,7 @@ export default {
               name: "toyokawa",
             },
             mediaId: 2,
-            position: {
-              name: "エンジニア",
-              color: "blue",
-            },
+            positionId: 2,
             startedDate: "2021.11.01",
           },
         ],
@@ -95,10 +99,7 @@ export default {
               name: "toyokawa",
             },
             mediaId: 3,
-            position: {
-              name: "デザイナー",
-              color: "yellow",
-            },
+            positionId: 3,
             startedDate: "2021.11.01",
           },
         ],
@@ -145,9 +146,27 @@ export default {
         color: 'red',
       },
     ]
+    const positionList = [
+      {
+        id: 1,
+        name: 'エンジニア',
+        color: 'blue',
+      },
+      {
+        id: 2,
+        name: 'デザイナー',
+        color: 'yellow',
+      },
+      {
+        id: 3,
+        name: 'ポテ枠',
+        color: 'gray',
+      },
+    ]
     return {
       kanban,
       mediaList,
+      positionList,
       currentCard: null,
     };
   },

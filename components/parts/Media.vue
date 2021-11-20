@@ -6,7 +6,7 @@
 export default {
   props: {
     mediaId: {
-      type: [Number, String, null],
+      type: [Number, null],
     }
   },
   data() {
@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     media() {
-      return this.mediaList.find(media => media.id == this.mediaId)
+      return this.mediaList.find(media => media.id === this.mediaId)
     }
   }
 }

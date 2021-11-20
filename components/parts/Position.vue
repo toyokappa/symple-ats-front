@@ -5,8 +5,35 @@
 <script>
 export default {
   props: {
-    position: {
-      type: [Object, null],
+    positionId: {
+      type: [Number, null],
+    }
+  },
+  data() {
+    const positionList = [
+      {
+        id: 1,
+        name: 'エンジニア',
+        color: 'blue',
+      },
+      {
+        id: 2,
+        name: 'デザイナー',
+        color: 'yellow',
+      },
+      {
+        id: 3,
+        name: 'ポテ枠',
+        color: 'gray',
+      },
+    ]
+    return {
+      positionList
+    }
+  },
+  computed: {
+    position() {
+      return this.positionList.find(position => position.id === this.positionId)
     }
   }
 }
