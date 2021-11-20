@@ -3,9 +3,12 @@
   parts-kanban-column(:kanban="kanban" :openModal="openModal")
   parts-modal(ref="kanbanModal")
     template(v-if="currentCard")
-      .text-3xl.font-bold.mb-5
-        template(v-if="currentCard.name") {{ currentCard.name }}
-        .text-gray-300(v-else) 名前未入力
+      input.text-3xl.font-bold.outline-none.placeholder-gray-300.mb-5(
+        type="text"
+        v-model="currentCard.name"
+        placeholder="名前未入力"
+        ref="nameField"
+      )
       .grid.grid-cols-6.mb-3.items-center
         .text-sm 選考状態
         .col-start-2.col-span-5
@@ -133,6 +136,9 @@ export default {
     openModal(card) {
       this.currentCard = card
       this.$refs.kanbanModal.openModal()
+      this.$nextTick(() => {
+        this.$refs.nameField.focus()
+      })
     },
   },
   computed: {
