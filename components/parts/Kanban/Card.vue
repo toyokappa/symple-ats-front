@@ -4,6 +4,7 @@ draggable(
   group="kanban"
   @start="drag = true"
   @end="drag = false"
+  @change="updateColumnId"
   ghostClass="ghost"
   :animation="200"
   :disabled="false",
@@ -28,6 +29,10 @@ export default {
       type: Array,
       required: true,
     },
+    columnId: {
+      type: Number,
+      required: true
+    },
     openModal: {
       type: Function,
       required: true,
@@ -38,6 +43,15 @@ export default {
       drag: false,
     };
   },
+  methods: {
+    updateColumnId({ added }) {
+      this.cardList.forEach(card => {
+        if (card.columnId !== this.columnId) {
+          card.columnId = this.columnId
+        }
+      })
+    }
+  }
 }
 </script>
 

@@ -14,7 +14,7 @@ draggable(
         h3.text-sm.mr-2 {{ column.name }}
         .text-sm.text-gray-500 {{ column.list.length }}
       .bg-white.p-3
-        parts-kanban-card(:cardList="column.list" :openModal="openModal")
+        parts-kanban-card(:cardList="column.list" :columnId="column.id" :openModal="openModal")
         .bg-white.rounded.border.border-gray-200.px-3.py-2.mb-2(v-show="createColumnId === column.id")
           input.text-sm.outline-none(
             type="text"

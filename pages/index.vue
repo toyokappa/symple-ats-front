@@ -9,11 +9,12 @@
         placeholder="名前未入力"
         ref="nameField"
       )
-      .grid.grid-cols-6.mb-3.items-center
+      .grid.grid-cols-6.mb-2.items-center
         .text-sm 選考状態
         .col-start-2.col-span-5
-          .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="`py-0.5`") {{ currentColumn.name }}
-          .text-sm.text-gray-300(v-else) 未入力
+          .px-2.py-1
+            .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="`py-0.5`") {{ currentColumn.name }}
+            .text-sm.text-gray-300(v-else) 未入力
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 担当者
         .col-start-2.col-span-5
@@ -44,7 +45,7 @@
               parts-media(:mediaId="option.id")
             template(v-slot:option="option")
               parts-media(:mediaId="option.id")
-      .grid.grid-cols-6.mb-3.items-center
+      .grid.grid-cols-6.mb-2.items-center
         .text-sm ポジション
         .col-start-2.col-span-5
           v-select.text-sm.text-gray-300(
@@ -62,7 +63,7 @@
       .grid.grid-cols-6.mb-3.items-center
         .text-sm 選考開始日
         .col-start-2.col-span-5
-          parts-started-date(:date="currentCard.startedDate")
+          .text-sm.px-2.py-1 {{ currentCard.startedDate }}
 </template>
 
 <script>
