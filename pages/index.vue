@@ -1,53 +1,35 @@
 <template lang="pug"> 
 .mx-auto.my-3
-  draggable(
-    :list="kanban"
-    @start="drag = true"
-    @end="drag = false"
-    ghostClass="ghost"
-    :animation="200"
-    :disabled="false",
-    item-key="id"
-  )
-    transition-group(class="inline-flex" type="transition" :name="!drag ? 'flip-list' : null")
-      .bg-white.w-72.rounded.border.border-gray-200.mx-2(v-for="column in kanban" :key="column.id")
-        .bg-gray-100.px-3.py-2.flex.justify-content-start.cursor-pointer
-          h3.text-sm.mr-2 {{ column.name }}
-          .text-sm.text-gray-500 {{ column.list.length }}
-        .bg-white.p-3
-          draggable(
-            :list="column.list"
-            group="kanban"
-            @start="drag = true"
-            @end="drag = false"
-            ghostClass="ghost"
-            :animation="200"
-            :disabled="false",
-            :emptyInsertThreshold="100"
-            item-key="order"
-          )
-            .bg-white.rounded.border.border-gray-200.shadow-sm.p-3.mb-2.cursor-pointer(v-for="item in column.list" :key="item.id")
-              .text-sm.mb-1(v-if="item.name") {{ item.name }}
-              .text-sm.text-gray-400.mb-1(v-else) 名前未入力
-              .flex.items-center.mb-1(v-if="item.recruiter")
-                .w-5.h-5.bg-gray-100.rounded-full.mr-1
-                .text-xs {{ item.recruiter.name }}
-              .inline-block.text-xs.rounded.px-2(v-if="item.media" :class="`bg-${item.media.color}-100 py-0.5`") {{ item.media.name }}
-              .mb-1
-              .inline-block.text-xs.rounded.px-2(v-if="item.position" :class="`bg-${item.position.color}-100 py-0.5`") {{ item.position.name }}
-              .mb-2
-              .text-xs {{ item.startedDate }}
-          .bg-white.rounded.border.border-gray-200.px-3.py-2.mb-2(v-show="createColumnId === column.id")
-            input.text-sm.outline-none(
-              type="text"
-              placeholder="候補者名を入力"
-              :ref="`column${column.id}`"
-              v-model="nameField"
-              @keydown.enter="appendCard"
-              @blur="appendCard"
-            )
-          .bg-white.rounded.border.border-gray-200.px-3.py-2.cursor-pointer(@click="displayCreateForm(column.id)")
-            .text-sm.text-gray-400 + 新規作成
+  parts-kanban-column(:kanban="kanban" :openModal="openModal")
+  parts-modal(ref="kanbanModal")
+    template(v-if="currentCard")
+      .text-3xl.font-bold.mb-5
+        template(v-if="currentCard.name") {{ currentCard.name }}
+        .text-gray-300(v-else) 名前未入力
+      .grid.grid-cols-6.mb-3.items-center
+        .text-sm 選考状態
+        .col-start-2.col-span-5
+          .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="`py-0.5`") {{ currentColumn.name }}
+          .text-sm.text-gray-300(v-else) 未入力
+      .grid.grid-cols-6.mb-3.items-center
+        .text-sm 担当者
+        .col-start-2.col-span-5
+          parts-recruiter(v-if="currentCard.recruiter" :recruiter="currentCard.recruiter")
+          .text-sm.text-gray-300(v-else) 未入力
+      .grid.grid-cols-6.mb-3.items-center
+        .text-sm 応募媒体
+        .col-start-2.col-span-5
+          parts-media(v-if="currentCard.media" :media="currentCard.media")
+          .text-sm.text-gray-300(v-else) 未入力
+      .grid.grid-cols-6.mb-3.items-center
+        .text-sm ポジション
+        .col-start-2.col-span-5
+          parts-position(v-if="currentCard.position" :position="currentCard.position")
+          .text-sm.text-gray-300(v-else) 未入力
+      .grid.grid-cols-6.mb-3.items-center
+        .text-sm 選考開始日
+        .col-start-2.col-span-5
+          parts-started-date(:date="currentCard.startedDate")
 </template>
 
 <script>
@@ -60,6 +42,7 @@ export default {
         list: [
           {
             id: 1,
+            columnId: 1,
             name: "シンプル 太郎",
             recruiter: {
               name: "toyokawa",
@@ -76,6 +59,7 @@ export default {
           },
           {
             id: 2,
+            columnId: 1,
             name: "シンプル 次郎",
             recruiter: {
               name: "toyokawa",
@@ -98,6 +82,7 @@ export default {
         list: [
           {
             id: 3,
+            columnId: 2,
             name: "シンプル 三郎",
             recruiter: {
               name: "toyokawa",
@@ -141,33 +126,55 @@ export default {
     ]
     return {
       kanban,
-      drag: false,
-      createColumnId: null,
-      nameField: ""
+      currentCard: null,
     };
   },
   methods: {
-    displayCreateForm(columnId) {
-      this.createColumnId = columnId
-      this.$nextTick(() =>{
-        this.$refs[`column${columnId}`][0].focus()
-      })
+    openModal(card) {
+      this.currentCard = card
+      this.$refs.kanbanModal.openModal()
     },
-    appendCard(event) {
-      if (event.keyCode && event.keyCode !== 13) return // 日本語変換確定のエンターは対象外
-      if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
-
-      const column = this.kanban.find(column => column.id === this.createColumnId)
-      const startedDate = this.$dateFns.format(new Date(), "yyyy.MM.dd")
-      column.list.push({ id: column.list.length + 1, name: this.nameField, recruiter: null, media: null, position: null, startedDate })
-      this.createColumnId = null
-      this.nameField = ""
-    }
   },
+  computed: {
+    currentColumn() {
+      return this.kanban.find(column => column.id === this.currentCard.columnId)
+    }
+  }
 }
 </script>
 
 <style lang="sass" scoped>
-.ghost
-  opacity: 0.5
+.modal
+  &__overlay
+    display: flex
+    align-items: center
+    justify-content: center
+    position: fixed
+    z-index: 100
+    top: 0
+    left: 0
+    height: 100%
+    width: 100%
+    background-color: rgba(0, 0, 0, 0.3)
+  &__window
+    height: 70%
+    width: 70%
+    max-width: 800px
+    overflow: hidden
+    background-color: white
+  &__content
+    height: 100%
+    padding: 30px
+
+.modal-enter-active, .modal-leave-active
+  transition: opacity 0.4s
+  .modal__window
+    transition: opacity 0.4s, transform 0.4s
+.modal-leave-active
+  transition: opacity 0.6s ease 0.4s
+.modal-enter, .modal-leave-to
+  opacity: 0
+  .modal__window
+    opacity: 0
+    transform: translateY(-20px)
 </style>
