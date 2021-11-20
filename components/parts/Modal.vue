@@ -1,8 +1,8 @@
 <template lang="pug"> 
 transition(v-if="modalFlag" name="modal" appear)
-  .modal__overlay.d-flex.items-center.justify-center.h-100.w-100(@click.self="closeModal")
-    .modal__window.overflow-hidden.bg-white.rounded.drop-shadow
-      .modal__content.h-100.p-10
+  .modal__overlay(@click.self="closeModal")
+    .modal__window.rounded.drop-shadow
+      .modal__content
         slot
 </template>
 
@@ -27,16 +27,25 @@ export default {
 <style lang="sass" scoped>
 .modal
   &__overlay
+    display: flex
+    align-items: center
+    justify-content: center
     position: fixed
     z-index: 100
     top: 0
     left: 0
+    height: 100%
+    width: 100%
     background-color: rgba(0, 0, 0, 0.3)
   &__window
     height: 85%
     width: 70%
     max-width: 800px
+    overflow: hidden
+    background-color: white
   &__content
+    height: 100%
+    padding: 30px
 
 .modal-enter-active, .modal-leave-active
   transition: opacity 0.4s

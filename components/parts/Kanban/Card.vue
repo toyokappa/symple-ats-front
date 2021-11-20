@@ -14,7 +14,7 @@ draggable(
     .text-sm.mb-1(v-if="card.name") {{ card.name }}
     .text-sm.text-gray-300.mb-1(v-else) 名前未入力
     parts-recruiter.mb-1(:recruiter="card.recruiter")
-    parts-media(:media="card.media")
+    parts-media(:mediaId="card.mediaId")
     .mb-1
     parts-position(:position="card.position")
     .mb-2

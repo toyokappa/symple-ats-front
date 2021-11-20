@@ -22,8 +22,18 @@
       .grid.grid-cols-6.mb-3.items-center
         .text-sm 応募媒体
         .col-start-2.col-span-5
-          parts-media(v-if="currentCard.media" :media="currentCard.media")
-          .text-sm.text-gray-300(v-else) 未入力
+          v-select.text-sm.text-gray-300(
+            v-model="currentCard.mediaId"
+            placeholder="未入力"
+            :options="mediaList"
+            :reduce="media => media.id"
+            label="name"
+            :class="'v-select-custom-style'"
+          )
+            template(#selected-option="option")
+              parts-media(:mediaId="option.id")
+            template(v-slot:option="option")
+              parts-media(:mediaId="option.id")
       .grid.grid-cols-6.mb-3.items-center
         .text-sm ポジション
         .col-start-2.col-span-5
@@ -50,10 +60,7 @@ export default {
             recruiter: {
               name: "toyokawa",
             },
-            media: {
-              name: "Green",
-              color: "green",
-            },
+            mediaId: 1,
             position: {
               name: "エンジニア",
               color: "blue",
@@ -67,10 +74,7 @@ export default {
             recruiter: {
               name: "toyokawa",
             },
-            media: {
-              name: "JAC",
-              color: "red",
-            },
+            mediaId: 2,
             position: {
               name: "エンジニア",
               color: "blue",
@@ -90,10 +94,7 @@ export default {
             recruiter: {
               name: "toyokawa",
             },
-            media: {
-              name: "Wantedly",
-              color: "green",
-            },
+            mediaId: 3,
             position: {
               name: "デザイナー",
               color: "yellow",
@@ -127,8 +128,26 @@ export default {
         ],
       },
     ]
+    const mediaList = [
+      {
+        id: 1,
+        name: 'Wantedly',
+        color: 'green',
+      },
+      {
+        id: 2,
+        name: 'Green',
+        color: 'green',
+      },
+      {
+        id: 3,
+        name: 'JAC',
+        color: 'red',
+      },
+    ]
     return {
       kanban,
+      mediaList,
       currentCard: null,
     };
   },
@@ -149,38 +168,11 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
-.modal
-  &__overlay
-    display: flex
-    align-items: center
-    justify-content: center
-    position: fixed
-    z-index: 100
-    top: 0
-    left: 0
-    height: 100%
-    width: 100%
-    background-color: rgba(0, 0, 0, 0.3)
-  &__window
-    height: 70%
-    width: 70%
-    max-width: 800px
-    overflow: hidden
-    background-color: white
-  &__content
-    height: 100%
-    padding: 30px
-
-.modal-enter-active, .modal-leave-active
-  transition: opacity 0.4s
-  .modal__window
-    transition: opacity 0.4s, transform 0.4s
-.modal-leave-active
-  transition: opacity 0.6s ease 0.4s
-.modal-enter, .modal-leave-to
-  opacity: 0
-  .modal__window
-    opacity: 0
-    transform: translateY(-20px)
+<style lang="sass">
+.v-select-custom-style
+  .vs__dropdown-toggle
+    outline: none
+    border: none
+    &:hover
+      background-color: rgba(243, 244, 246, 1)
 </style>
