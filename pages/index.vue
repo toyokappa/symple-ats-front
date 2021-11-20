@@ -14,11 +14,21 @@
         .col-start-2.col-span-5
           .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="`py-0.5`") {{ currentColumn.name }}
           .text-sm.text-gray-300(v-else) 未入力
-      .grid.grid-cols-6.mb-3.items-center
+      .grid.grid-cols-6.mb-2.items-center
         .text-sm 担当者
         .col-start-2.col-span-5
-          parts-recruiter(v-if="currentCard.recruiter" :recruiter="currentCard.recruiter")
-          .text-sm.text-gray-300(v-else) 未入力
+          v-select.text-sm.text-gray-300(
+            v-model="currentCard.recruiterId"
+            placeholder="未入力"
+            :options="recruiterList"
+            :reduce="recruiter => recruiter.id"
+            label="name"
+            :class="'v-select-custom-style'"
+          )
+            template(#selected-option="option")
+              parts-recruiter(:recruiterId="option.id")
+            template(v-slot:option="option")
+              parts-recruiter(:recruiterId="option.id")
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 応募媒体
         .col-start-2.col-span-5
@@ -67,9 +77,7 @@ export default {
             id: 1,
             columnId: 1,
             name: "シンプル 太郎",
-            recruiter: {
-              name: "toyokawa",
-            },
+            recruiterId: 1,
             mediaId: 1,
             positionId: 1,
             startedDate: "2021.11.01",
@@ -78,9 +86,7 @@ export default {
             id: 2,
             columnId: 1,
             name: "シンプル 次郎",
-            recruiter: {
-              name: "toyokawa",
-            },
+            recruiterId: 2,
             mediaId: 2,
             positionId: 2,
             startedDate: "2021.11.01",
@@ -95,9 +101,7 @@ export default {
             id: 3,
             columnId: 2,
             name: "シンプル 三郎",
-            recruiter: {
-              name: "toyokawa",
-            },
+            recruiterId: 3,
             mediaId: 3,
             positionId: 3,
             startedDate: "2021.11.01",
@@ -127,6 +131,20 @@ export default {
         name: '内定承諾',
         list: [
         ],
+      },
+    ]
+    const recruiterList = [
+      {
+        id: 1,
+        name: 'toyokawa',
+      },
+      {
+        id: 2,
+        name: 'yamada',
+      },
+      {
+        id: 3,
+        name: 'tanaka',
       },
     ]
     const mediaList = [
@@ -165,6 +183,7 @@ export default {
     ]
     return {
       kanban,
+      recruiterList,
       mediaList,
       positionList,
       currentCard: null,

@@ -13,7 +13,7 @@ draggable(
   .bg-white.rounded.border.border-gray-200.shadow-sm.p-3.mb-2.cursor-pointer(v-for="card in cardList" :key="card.id" @click="openModal(card)")
     .text-sm.mb-1(v-if="card.name") {{ card.name }}
     .text-sm.text-gray-300.mb-1(v-else) 名前未入力
-    parts-recruiter.mb-1(:recruiter="card.recruiter")
+    parts-recruiter.mb-1(:recruiterId="card.recruiterId")
     parts-media(:mediaId="card.mediaId")
     .mb-1
     parts-position(:positionId="card.positionId")

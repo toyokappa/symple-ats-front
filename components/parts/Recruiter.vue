@@ -7,8 +7,32 @@
 <script>
 export default {
   props: {
-    recruiter: {
-      type: [Object, null],
+    recruiterId: {
+      type: [Number, null],
+    }
+  },
+  data() {
+    const recruiterList = [
+      {
+        id: 1,
+        name: 'toyokawa',
+      },
+      {
+        id: 2,
+        name: 'yamada',
+      },
+      {
+        id: 3,
+        name: 'tanaka',
+      },
+    ]
+    return {
+      recruiterList
+    }
+  },
+  computed: {
+    recruiter() {
+      return this.recruiterList.find(recruiter => recruiter.id === this.recruiterId)
     }
   }
 }
