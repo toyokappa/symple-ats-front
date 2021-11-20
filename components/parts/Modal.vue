@@ -1,7 +1,7 @@
 <template lang="pug"> 
 transition(v-if="modalFlag" name="modal" appear)
   .modal__overlay.d-flex.items-center.justify-center.h-100.w-100(@click.self="closeModal")
-    .modal__window.overflow-hidden.bg-white.rounded
+    .modal__window.overflow-hidden.bg-white.rounded.drop-shadow
       .modal__content.h-100.p-10
         slot
 </template>
@@ -33,7 +33,7 @@ export default {
     left: 0
     background-color: rgba(0, 0, 0, 0.3)
   &__window
-    height: 70%
+    height: 85%
     width: 70%
     max-width: 800px
   &__content
