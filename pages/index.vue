@@ -209,9 +209,18 @@ export default {
 
 <style lang="sass">
 .v-select-custom-style
+  &.vs--single.vs--open
+    .vs__dropdown-toggle
+      background-color: rgba(243, 244, 246, 1)
+    .vs__selected
+      opacity: 1
   .vs__dropdown-toggle
     outline: none
     border: none
     &:hover
+      background-color: rgba(243, 244, 246, 1)
+  .vs__dropdown-option
+    padding: 0.25rem 0.5rem
+    &--highlight
       background-color: rgba(243, 244, 246, 1)
 </style>
