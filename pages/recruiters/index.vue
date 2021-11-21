@@ -3,11 +3,13 @@
   .text-2xl.font-bold.mb-5 リクルーター管理
   .flex.justify-end.mb-2
     input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="keyword")
-    select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="authority")
+    select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="authority" :class="dummyPlaceholder(authority)")
+      option(value="" selected) 権限で絞り込む
       option(value="管理者") 管理者
       option(value="面接官") 面接官
       option(value="閲覧者") 閲覧者
-    select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="level")
+    select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="level" :class="dummyPlaceholder(level)")
+      option(:value="null" selected) 利用練度で絞り込む
       option(:value="1") Lv. 1
       option(:value="2") Lv. 2
       option(:value="3") Lv. 3
@@ -37,7 +39,9 @@
       )
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(
         v-model="invitation.authority"
+        :class="dummyPlaceholder(invitation.authority)"
       )
+        option(value="" selected style="display: none") 付与する権限
         option(value="管理者") 管理者
         option(value="面接官") 面接官
         option(value="閲覧者") 閲覧者
@@ -72,6 +76,9 @@ export default {
     }
   },
   methods: {
+    dummyPlaceholder(value) {
+      return !value ? 'text-gray-300' : ''
+    },
     addInvitation() {
       const invitation = { email: '', authority: '' }
       this.invitationList = [...this.invitationList, invitation]
