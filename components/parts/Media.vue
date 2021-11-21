@@ -3,6 +3,9 @@
 </template>
 
 <script>
+// TODO: データ基盤ができたらいずれは削除
+import { mediaList } from '@/fixtures'
+
 export default {
   props: {
     mediaId: {
@@ -10,23 +13,6 @@ export default {
     }
   },
   data() {
-    const mediaList = [
-      {
-        id: 1,
-        name: 'Wantedly',
-        color: 'green',
-      },
-      {
-        id: 2,
-        name: 'Green',
-        color: 'green',
-      },
-      {
-        id: 3,
-        name: 'JAC',
-        color: 'red',
-      },
-    ]
     return {
       mediaList
     }

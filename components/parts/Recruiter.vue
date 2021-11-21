@@ -5,6 +5,9 @@
 </template>
 
 <script>
+// TODO: データ基盤ができたらいずれは削除
+import { recruiterList } from '@/fixtures'
+
 export default {
   props: {
     recruiterId: {
@@ -12,20 +15,6 @@ export default {
     }
   },
   data() {
-    const recruiterList = [
-      {
-        id: 1,
-        name: 'toyokawa',
-      },
-      {
-        id: 2,
-        name: 'yamada',
-      },
-      {
-        id: 3,
-        name: 'tanaka',
-      },
-    ]
     return {
       recruiterList
     }

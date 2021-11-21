@@ -3,6 +3,9 @@
 </template>
 
 <script>
+// TODO: データ基盤ができたらいずれは削除
+import { positionList } from '@/fixtures'
+
 export default {
   props: {
     positionId: {
@@ -10,23 +13,6 @@ export default {
     }
   },
   data() {
-    const positionList = [
-      {
-        id: 1,
-        name: 'エンジニア',
-        color: 'blue',
-      },
-      {
-        id: 2,
-        name: 'デザイナー',
-        color: 'yellow',
-      },
-      {
-        id: 3,
-        name: 'ポテ枠',
-        color: 'gray',
-      },
-    ]
     return {
       positionList
     }
