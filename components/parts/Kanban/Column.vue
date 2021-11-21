@@ -59,7 +59,6 @@ export default {
       if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
 
       const column = this.kanban.find(column => column.id === this.createColumnId)
-      const startedDate = this.$dateFns.format(new Date(), "yyyy.MM.dd")
       column.list.push({
         id: column.list.length + 1,
         columnId: column.id,
@@ -67,7 +66,7 @@ export default {
         recruiter: null,
         media: null,
         position: null,
-        startedDate
+        startedDate: new Date()
       })
       this.createColumnId = null
       this.nameField = ""

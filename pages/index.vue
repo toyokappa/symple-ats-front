@@ -63,7 +63,19 @@
       .grid.grid-cols-6.mb-3.items-center
         .text-sm 選考開始日
         .col-start-2.col-span-5
-          .text-sm.px-2.py-1 {{ currentCard.startedDate }}
+          v-date-picker(
+            v-model="currentCard.startedDate"
+            :masks="{ input: 'YYYY.MM.DD' }"
+            :popover="{ visibility: 'focus' }"
+            trim-weeks
+          )
+            template(v-slot="{ inputValue, inputEvents }")
+              input.text-sm.px-2.py-1.w-full.outline-none.rounded.placeholder-gray-300(
+                :class="'hover:bg-gray-100 focus:bg-gray-100'"
+                :value="inputValue"
+                v-on="inputEvents"
+                placeholder="未入力"
+              )
 </template>
 
 <script>
@@ -81,7 +93,7 @@ export default {
             recruiterId: 1,
             mediaId: 1,
             positionId: 1,
-            startedDate: "2021.11.01",
+            startedDate: new Date("2021.11.01"),
           },
           {
             id: 2,
@@ -90,7 +102,7 @@ export default {
             recruiterId: 2,
             mediaId: 2,
             positionId: 2,
-            startedDate: "2021.11.01",
+            startedDate: new Date("2021.11.02"),
           },
         ],
       },
@@ -105,7 +117,7 @@ export default {
             recruiterId: 3,
             mediaId: 3,
             positionId: 3,
-            startedDate: "2021.11.01",
+            startedDate: new Date("2021.11.03"),
           },
         ],
       },
