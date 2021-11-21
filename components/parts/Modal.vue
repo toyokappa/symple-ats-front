@@ -38,10 +38,13 @@ export default {
     width: 100%
     background-color: rgba(0, 0, 0, 0.3)
   &__window
-    height: 85%
+    position: absolute
+    top: 7.5%
+    max-height: 85%
     width: 70%
     max-width: 800px
     background-color: white
+    overflow-y: scroll
   &__content
     height: 100%
     padding: 30px 50px
