@@ -41,11 +41,11 @@ export default {
     height: 85%
     width: 70%
     max-width: 800px
-    overflow: hidden
     background-color: white
   &__content
     height: 100%
-    padding: 30px
+    padding: 30px 50px
+    overflow-y: scroll
 
 .modal-enter-active, .modal-leave-active
   transition: opacity 0.4s

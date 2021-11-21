@@ -76,6 +76,25 @@
                 v-on="inputEvents"
                 placeholder="未入力"
               )
+      .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="result in currentCard.selectionResults" :key="result.id")
+        .bg-gray-100.px-3.py-2.flex.justify-content-start
+          h3.text-sm.mr-5 {{ result.columnName }}
+          .text-sm.text-gray-500 {{ result.totalResult }}
+        .bg-white.p-3
+          .bg-white.rounded.border.border-gray-200.shadow-sm.p-4.mb-2(v-for="iResult in result.individualResults" :key="iResult.id")
+            .grid.grid-cols-8.mb-3.items-center
+              .text-sm 選考官
+              .col-start-2.col-span-7
+                parts-recruiter(:recruiterId="iResult.recruiterId")
+            .grid.grid-cols-8.mb-3.items-center
+              .text-sm 結果
+              .col-start-2.col-span-7
+                .text-sm {{ iResult.result }}
+            .grid.grid-cols-8.mb-3.items-center
+              .text-sm 入力日
+              .col-start-2.col-span-7
+                parts-date.text-sm(:date="iResult.inputDate")
+            .text-sm {{ iResult.description }}
 </template>
 
 <script>
@@ -94,6 +113,48 @@ export default {
             mediaId: 1,
             positionId: 1,
             startedDate: new Date("2021.11.01"),
+            selectionResults: [
+              {
+                id: 1,
+                columnId: 2,
+                columnName: '書類選考', // 暫定的に追加
+                totalResult: '合格',
+                individualResults: [
+                  {
+                    id: 1,
+                    selectionResultId: 1,
+                    recruiterId: 1,
+                    result: '合格',
+                    inputDate: new Date("2021.11.10"),
+                    description: 'とても良かったです。'
+                  },
+                  {
+                    id: 2,
+                    selectionResultId: 1,
+                    recruiterId: 2,
+                    result: '不合格',
+                    inputDate: new Date("2021.11.11"),
+                    description: '若干悩んだ。'
+                  },
+                ]
+              },
+              {
+                id: 2,
+                columnId: 3,
+                columnName: '1次面接', // 暫定的に追加
+                totalResult: '不合格',
+                individualResults: [
+                  {
+                    id: 1,
+                    selectionResultId: 2,
+                    recruiterId: 1,
+                    result: '不合格',
+                    inputDate: new Date("2021.11.12"),
+                    description: '話した感じ物足りなかったです。'
+                  },
+                ]
+              }
+            ]
           },
           {
             id: 2,
@@ -103,6 +164,7 @@ export default {
             mediaId: 2,
             positionId: 2,
             startedDate: new Date("2021.11.02"),
+            selectionResults: [],
           },
         ],
       },
@@ -118,6 +180,7 @@ export default {
             mediaId: 3,
             positionId: 3,
             startedDate: new Date("2021.11.03"),
+            selectionResults: [],
           },
         ],
       },

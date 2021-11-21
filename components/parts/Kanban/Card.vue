@@ -19,7 +19,7 @@ draggable(
       parts-media(:mediaId="card.mediaId")
     .mt-1(v-if="card.positionId")
       parts-position(:positionId="card.positionId")
-    parts-started-date.text-xs.mt-2(:date="card.startedDate")
+    parts-date.text-xs.mt-2(:date="card.startedDate")
 </template>
 
 <script>
