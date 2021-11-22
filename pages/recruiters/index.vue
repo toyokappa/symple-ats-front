@@ -13,7 +13,7 @@
       option(:value="1") Lv. 1
       option(:value="2") Lv. 2
       option(:value="3") Lv. 3
-    button.text-sm.text-gray-400.bg-gray-200.border.rounded.px-2.py-1(@click="$refs.invitationModal.openModal()") リクルーターを招待する
+    button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.invitationModal.openModal()") リクルーターを招待する
   table.w-full
     thead.text-sm.text-left.border-t.border-b.border-gray-200
       tr
@@ -52,7 +52,7 @@
       @click="addInvitation()"
     ) + 招待先を更に追加する
     .text-right
-      button.text-sm.text-gray-400.bg-gray-200.border.rounded.px-2.py-1(
+      button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(
         @click="sendInvitation()"
       ) 招待メールを送信する
 </template>
