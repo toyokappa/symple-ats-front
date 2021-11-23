@@ -21,3 +21,15 @@ export default [
     level: 1,
   },
 ]
+
+export const authorities = [
+  '管理者',
+  '面接官',
+  '閲覧者',
+]
+
+export const levels = [
+  1,
+  2,
+  3,
+]

@@ -13,7 +13,7 @@
         .text-sm 選考状態
         .col-start-2.col-span-5
           .px-2.py-1
-            .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="`py-0.5`") {{ currentColumn.name }}
+            .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="'py-0.5'") {{ currentColumn.name }}
             .text-sm.text-gray-300(v-else) 未入力
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 担当者
@@ -129,19 +129,4 @@ export default {
 </script>
 
 <style lang="sass">
-.v-select-custom-style
-  &.vs--single.vs--open
-    .vs__dropdown-toggle
-      background-color: rgba(243, 244, 246, 1)
-    .vs__selected
-      opacity: 1
-  .vs__dropdown-toggle
-    outline: none
-    border: none
-    &:hover
-      background-color: rgba(243, 244, 246, 1)
-  .vs__dropdown-option
-    padding: 0.25rem 0.5rem
-    &--highlight
-      background-color: rgba(243, 244, 246, 1)
 </style>
