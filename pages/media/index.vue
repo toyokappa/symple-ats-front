@@ -4,7 +4,7 @@
   .flex.justify-end.mb-2
     input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="keyword")
     select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="category" :class="dummyPlaceholder(category)")
-      option(value="" selected) 媒体種別で絞り込む
+      option(:value="null" selected) 媒体種別で絞り込む
       option(v-for="auth in authorities" :value="auth" :key="auth") {{ auth }}
     button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.addMediaModal.openModal()") 媒体を追加する
   table.w-full
