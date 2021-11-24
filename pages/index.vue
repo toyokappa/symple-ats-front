@@ -1,5 +1,5 @@
 <template lang="pug"> 
-.mx-auto.my-3
+.p-5
   parts-kanban-column(:kanban="kanban" :openModal="openModal")
   parts-modal(ref="kanbanModal")
     template(v-if="currentCard")
