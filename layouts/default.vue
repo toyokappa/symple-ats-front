@@ -8,6 +8,8 @@ div
         li.mb-3
           n-link(to="/") 採用進捗カンバン
         li.mb-3
+          n-link(to="/analytics") 数値分析
+        li.mb-3
           n-link(to="/recruiters") リクルーター管理
         li.mb-3
           n-link(to="/media") 媒体管理

@@ -9,9 +9,11 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "chart.js": "^2.9.4",
     "core-js": "^3.9.1",
     "nuxt": "^2.15.3",
     "v-calendar": "^2.3.4",
+    "vue-chartjs": "^3.5.1",
     "vue-select": "^3.16.0",
     "vuedraggable": "^2.24.3"
   },
