@@ -29,7 +29,7 @@
           template(v-for="(value, i) in filterDisplayValues(index)")
             td.px-2.py-3.text-center {{ value }}
             template(v-if="i < filterDisplayValues(index).length - 1")
-              td.px-2.py-3.text-center.text-xs {{ Math.floor(filterDisplayValues(index)[i + 1] / value * 10 * 100) / 10 }}%
+              td.px-2.py-3.text-center.text-xs {{ (filterDisplayValues(index)[i + 1] / value * 100).toFixed(1) }}%
 </template>
 
 <script>
@@ -64,7 +64,7 @@ export default {
       return this.chartLabels.filter((_, index) => index < this.chartLabels.length - 1)
     },
     valuePercentage() {
-      return this.dataValues.map((value, index) => Math.floor(this.dataValues[index + 1] / value * 10 * 100) / 10)
+      return this.dataValues.map((value, index) => (this.dataValues[index + 1] / value * 100).toFixed(1))
     },
     chartData() {
       return {
