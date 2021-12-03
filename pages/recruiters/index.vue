@@ -4,9 +4,9 @@
     .text-2xl.font-bold.mb-5 リクルーター管理
     .flex.justify-end.mb-2
       input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="keyword")
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="authority" :class="dummyPlaceholder(authority)")
-        option(value="" selected) 権限で絞り込む
-        option(v-for="auth in authorities" :value="auth" :key="auth") {{ auth }}
+      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="role" :class="dummyPlaceholder(role)")
+        option(:value="null" selected) 権限で絞り込む
+        option(v-for="r in roles" :value="r.value" :key="r.value") {{ r.name }}
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="level" :class="dummyPlaceholder(level)")
         option(:value="null" selected) 利用練度で絞り込む
         option(v-for="lv in levels" :value="lv" :key="lv") Lv. {{ lv }}
@@ -29,7 +29,7 @@
             parts-recruiter(v-if="recruiter.name" :recruiterId="recruiter.id")
             .text-sm.text-gray-400(v-else) 招待中...
           td.px-2.py-3 {{ recruiter.email }}
-          td.px-2.py-3 {{ recruiter.authority }}
+          td.px-2.py-3 {{ recruiter.role }}
           td.px-2.py-3 Lv. {{ recruiter.level }}
     parts-modal(ref="invitationModal")
       .text-3xl.font-bold.mb-5 リクルーター招待
@@ -40,11 +40,11 @@
           placeholder="招待先のメールアドレス"
         )
         select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(
-          v-model="invitation.authority"
-          :class="dummyPlaceholder(invitation.authority)"
+          v-model="invitation.role"
+          :class="dummyPlaceholder(invitation.role)"
         )
-          option(value="" selected style="display: none") 付与する権限
-          option(v-for="auth in authorities" :value="auth" :key="auth") {{ auth }}
+          option(:value="null" selected style="display: none") 付与する権限
+          option(v-for="r in roles" :value="r.value" :key="r.value") {{ r.name }}
         .text-sm.text-gray-300.border.border-gray-200.rounded.px-2.py-1.cursor-pointer(
           @click="removeInvitation(index)"
         ) ×
@@ -71,9 +71,10 @@
           .text-sm 権限
           .col-start-2.col-span-5
             v-select.text-sm.text-gray-300(
-              v-model="currentRecruiter.authority"
+              v-model="currentRecruiter.role"
               placeholder="未入力"
-              :options="authorities"
+              :options="roles"
+              :reduce="role => role.value"
               :class="'v-select-custom-style'"
             )
               template(#selected-option="option")
@@ -97,21 +98,21 @@
 
 <script>
 import { recruiterList } from '@/fixtures'
-import { authorities, levels } from '@/fixtures/recruiterList'
+import { roles, levels } from '@/fixtures/recruiterList'
 
 export default {
   data() {
     return {
       recruiterList,
-      authorities,
+      roles,
       levels,
       keyword: '',
-      authority: '',
+      role: null,
       level: null,
       invitationList: [
         {
           email: '',
-          authority: '',
+          role: null,
         },
       ],
       currentRecruiter: null,
@@ -122,7 +123,7 @@ export default {
       return !value ? 'text-gray-300' : ''
     },
     addInvitation() {
-      const invitation = { email: '', authority: '' }
+      const invitation = { email: '', role: '' }
       this.invitationList = [...this.invitationList, invitation]
     },
     removeInvitation(index) {
@@ -139,7 +140,7 @@ export default {
       })
       // TODO: メールを飛ばすロジックを追加する
       this.recruiterList = this.recruiterList.concat(newRecruiters)
-      this.invitationList = [{ email: '', authority: '' }]
+      this.invitationList = [{ email: '', role: null }]
       this.$refs.invitationModal.closeModal()
     },
     openEditModal(recruiter) {
