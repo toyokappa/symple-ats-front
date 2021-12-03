@@ -48,7 +48,6 @@ export default {
   &__content
     height: 100%
     padding: 30px 50px
-    overflow-y: scroll
 
 .modal-enter-active, .modal-leave-active
   transition: opacity 0.4s

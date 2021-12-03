@@ -1,6 +1,13 @@
 <template lang="pug">
 .w-full
   .p-8
+    .flex.justify-end.mb-2
+      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.section" :class="dummyPlaceholder(filter.section)")
+        option(value="" selected) 媒体区分で絞り込む
+        option(v-for="media in mediaSelection" :value="media" :key="media") {{ media }}
+      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.position" :class="dummyPlaceholder(filter.position)")
+        option(value="" selected) ポジションで絞り込む
+        option(v-for="position in positionList" :value="position.name" :key="position.id") {{ position.name }}
     .relative.mb-3
       .absolute.flex.w-full
         .flex-1.p-3(v-for="(value, index) in displayValues" :key="index")
@@ -33,12 +40,17 @@
 </template>
 
 <script>
-import { analytics } from "@/fixtures"
+import { analytics, positionList } from "@/fixtures"
 
 export default {
   data() {
     return {
       analytics,
+      positionList,
+      filter: {
+        section: "",
+        position: "",
+      },
       currentDatasetsIndex: 0
     }
   },
@@ -48,7 +60,10 @@ export default {
     },
     selectDatasets(index) {
       this.currentDatasetsIndex = index
-    }
+    },
+    dummyPlaceholder(value) {
+      return !value ? 'text-gray-300' : ''
+    },
   },
   computed: {
     dataValues() {
@@ -65,6 +80,9 @@ export default {
     },
     valuePercentage() {
       return this.dataValues.map((value, index) => (this.dataValues[index + 1] / value * 100).toFixed(1))
+    },
+    mediaSelection() {
+      return this.analytics.datasets.map(data => data.dataName)
     },
     chartData() {
       return {
