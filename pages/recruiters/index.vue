@@ -2,6 +2,8 @@
 .w-full
   .p-8
     .text-2xl.font-bold.mb-5 リクルーター管理
+
+    //- 検索UI（一旦後回し）
     .flex.justify-end.mb-2
       input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="keyword")
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="role" :class="dummyPlaceholder(role)")
@@ -11,13 +13,15 @@
         option(:value="null" selected) 利用練度で絞り込む
         option(v-for="lv in levels" :value="lv" :key="lv") Lv. {{ lv }}
       button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.invitationModal.openModal()") リクルーターを招待する
+
+    //- 一覧UI
     table.w-full
       thead.text-sm.text-left.border-t.border-b.border-gray-200
         tr
-          th.px-2.py-3 名前
-          th.px-2.py-3 メールアドレス
-          th.px-2.py-3 権限
-          th.px-2.py-3 利用練度
+          parts-table-head-column 名前
+          parts-table-head-column メールアドレス
+          parts-table-head-column 権限
+          parts-table-head-column 利用練度
       tbody.text-sm
         tr.cursor-pointer(
           v-for="recruiter in recruiterList"
@@ -25,12 +29,14 @@
           :class="'hover:bg-gray-100'"
           @click="openEditModal(recruiter)"
         )
-          td.px-2.py-3
-            parts-recruiter(v-if="recruiter.name" :recruiterId="recruiter.id")
+          parts-table-body-column
+            parts-recruiter(v-if="recruiter.nickname" :recruiter="recruiter")
             .text-sm.text-gray-400(v-else) 招待中...
-          td.px-2.py-3 {{ recruiter.email }}
-          td.px-2.py-3 {{ recruiter.role }}
-          td.px-2.py-3 Lv. {{ recruiter.level }}
+          parts-table-body-column {{ recruiter.email }}
+          parts-table-body-column {{ recruiter.role }}
+          parts-table-body-column Lv. {{ recruiter.level }}
+
+    //- 招待UI（一旦後回し）
     parts-modal(ref="invitationModal")
       .text-3xl.font-bold.mb-5 リクルーター招待
       .flex.mb-2(v-for="(invitation, index) in invitationList" :key="index")
@@ -55,6 +61,8 @@
         button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(
           @click="sendInvitation()"
         ) 招待メールを送信する
+
+    //- 編集UI（一旦後回し）
     parts-modal(ref="recruiterEditModal")
       template(v-if="currentRecruiter")
         input.text-3xl.font-bold.outline-none.placeholder-gray-300.mb-5(
@@ -97,13 +105,17 @@
 </template>
 
 <script>
-import { recruiterList } from '@/fixtures'
 import { roles, levels } from '@/fixtures/recruiterList'
 
 export default {
+  async asyncData({ $axios }) {
+    const { data } = await $axios.get('/users')
+    return {
+      recruiterList: data
+    }
+  },
   data() {
     return {
-      recruiterList,
       roles,
       levels,
       keyword: '',
