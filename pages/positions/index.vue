@@ -120,26 +120,22 @@ export default {
     remove(index) {
       this.addPositionList.splice(index, 1)
     },
-    create() {
+    async create() {
       if (this.addPositionList.length === 0) return
       // TODO: バリデーションロジックは追加する
 
       // データ通信
-      this.addPositionList.forEach(position => {
-        this.$axios.post('/positions', {
+      const newPositionList = await Promise.all(this.addPositionList.map(async position => {
+        const { data } = await this.$axios.post('/positions', {
           position: {
             internal_name: position.internalName,
             external_name: position.externalName,
           }
         })
-      })
+        return data
+      }))
 
       // 画面描画
-      const newPositionList = this.addPositionList.map((position, index) => {
-        position.id = this.positionList.length + index + 1
-        position.status = 'open'
-        return position
-      })
       this.positionList = this.positionList.concat(newPositionList)
 
       // 初期化

@@ -122,26 +122,22 @@ export default {
     remove(index) {
       this.addMedia.splice(index, 1)
     },
-    create() {
+    async create() {
       if (this.addMedia.length === 0) return
       // TODO: バリデーションロジックは追加する
 
       // データ通信
-      this.addMedia.forEach(medium => {
-        this.$axios.post('/media', {
+      const newMedia = await Promise.all(this.addMedia.map(async medium => {
+        const { data } = await this.$axios.post('/media', {
           medium: {
             name: medium.name,
             category: medium.category
           }
         })
-      })
+        return data
+      }))
 
       // 画面描画
-      const newMedia = this.addMedia.map((medium, index) => {
-        medium.id = this.media.length + index + 1
-        medium.automation = 'disable'
-        return medium
-      })
       this.media = this.media.concat(newMedia)
 
       // 初期化
