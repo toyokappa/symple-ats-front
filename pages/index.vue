@@ -3,68 +3,63 @@
   parts-kanban-column(:kanban="kanban" :openModal="openModal")
   parts-modal(ref="kanbanModal")
     template(v-if="currentCard")
-      input.text-3xl.font-bold.outline-none.placeholder-gray-300.mb-5(
-        type="text"
+      parts-form-title-like-text-field(
         v-model="currentCard.name"
-        placeholder="名前未入力"
+        @updateEvent="update('name')"
         ref="nameField"
       )
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 選考状態
         .col-start-2.col-span-5
           .px-2.py-1
-            .inline-block.text-xs.rounded.bg-gray-100.px-2(v-if="currentColumn.id > 1" :class="'py-0.5'") {{ currentColumn.name }}
-            .text-sm.text-gray-300(v-else) 未入力
+            .inline-block.text-xs.rounded.bg-gray-100.px-2(:class="'py-0.5'") {{ currentColumn.name }}
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 担当者
         .col-start-2.col-span-5
           v-select.text-sm.text-gray-300(
-            v-model="currentCard.recruiterId"
+            v-model="currentCard.recruiter"
             placeholder="未入力"
             :options="recruiterList"
-            :reduce="recruiter => recruiter.id"
-            label="name"
+            label="nickname"
             :class="'v-select-custom-style'"
           )
             template(#selected-option="option")
-              parts-recruiter(:recruiterId="option.id")
+              parts-recruiter(:recruiter="option")
             template(v-slot:option="option")
-              parts-recruiter(:recruiterId="option.id")
+              parts-recruiter(:recruiter="option")
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 応募媒体
         .col-start-2.col-span-5
           v-select.text-sm.text-gray-300(
-            v-model="currentCard.mediaId"
+            v-model="currentCard.medium"
             placeholder="未入力"
-            :options="mediaList"
-            :reduce="media => media.id"
+            :options="media"
             label="name"
             :class="'v-select-custom-style'"
           )
             template(#selected-option="option")
-              parts-media(:mediaId="option.id")
+              parts-medium(:medium="option")
             template(v-slot:option="option")
-              parts-media(:mediaId="option.id")
+              parts-medium(:medium="option")
       .grid.grid-cols-6.mb-2.items-center
         .text-sm ポジション
         .col-start-2.col-span-5
           v-select.text-sm.text-gray-300(
-            v-model="currentCard.positionId"
+            v-model="currentCard.position"
             placeholder="未入力"
             :options="positionList"
-            :reduce="postion => postion.id"
-            label="name"
+            label="internalName"
             :class="'v-select-custom-style'"
           )
             template(#selected-option="option")
-              parts-position(:positionId="option.id")
+              parts-position(:position="option")
             template(v-slot:option="option")
-              parts-position(:positionId="option.id")
+              parts-position(:position="option")
       .grid.grid-cols-6.mb-3.items-center
         .text-sm 選考開始日
         .col-start-2.col-span-5
           v-date-picker(
-            v-model="currentCard.startedDate"
+            v-model="currentCard.recruitmentStartedAt"
             :masks="{ input: 'YYYY.MM.DD' }"
             :popover="{ visibility: 'focus' }"
             trim-weeks
@@ -76,43 +71,45 @@
                 v-on="inputEvents"
                 placeholder="未入力"
               )
-      .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="result in currentCard.selectionResults" :key="result.id")
-        .bg-gray-100.px-3.py-2.flex.justify-content-start
-          h3.text-sm.mr-5 {{ result.columnName }}
-          .text-sm.text-gray-500 {{ result.totalResult }}
-        .bg-white.p-3
-          .bg-white.rounded.border.border-gray-200.shadow-sm.p-4.mb-2(v-for="iResult in result.individualResults" :key="iResult.id")
-            .grid.grid-cols-8.mb-3.items-center
-              .text-sm 選考官
-              .col-start-2.col-span-7
-                parts-recruiter(:recruiterId="iResult.recruiterId")
-            .grid.grid-cols-8.mb-3.items-center
-              .text-sm 結果
-              .col-start-2.col-span-7
-                .text-sm {{ iResult.result }}
-            .grid.grid-cols-8.mb-3.items-center
-              .text-sm 入力日
-              .col-start-2.col-span-7
-                parts-date.text-sm(:date="iResult.inputDate")
-            .text-sm {{ iResult.description }}
+      //- .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="result in currentCard.selectionResults" :key="result.id")
+      //-   .bg-gray-100.px-3.py-2.flex.justify-content-start
+      //-     h3.text-sm.mr-5 {{ result.columnName }}
+      //-     .text-sm.text-gray-500 {{ result.totalResult }}
+      //-   .bg-white.p-3
+      //-     .bg-white.rounded.border.border-gray-200.shadow-sm.p-4.mb-2(v-for="iResult in result.individualResults" :key="iResult.id")
+      //-       .grid.grid-cols-8.mb-3.items-center
+      //-         .text-sm 選考官
+      //-         .col-start-2.col-span-7
+      //-           parts-recruiter(:recruiterId="iResult.recruiterId")
+      //-       .grid.grid-cols-8.mb-3.items-center
+      //-         .text-sm 結果
+      //-         .col-start-2.col-span-7
+      //-           .text-sm {{ iResult.result }}
+      //-       .grid.grid-cols-8.mb-3.items-center
+      //-         .text-sm 入力日
+      //-         .col-start-2.col-span-7
+      //-           parts-date.text-sm(:date="iResult.inputDate")
+      //-       .text-sm {{ iResult.description }}
 </template>
 
 <script>
 // TODO: データ基盤ができたらいずれは削除
-import { recruiterList, mediaList, positionList } from '@/fixtures'
-
 export default {
   async asyncData({ $axios }) {
-    const { data } = await $axios.get('/recruitment_selections')
+    const { data: kanban } = await $axios.get('/recruitment_selections')
+    const { data: recruiterList } = await $axios.get('/recruiters')
+    const { data: media } = await $axios.get('/media')
+    const { data: positionList } = await $axios.get('/positions')
+
     return {
-      kanban: data
+      kanban,
+      recruiterList,
+      media,
+      positionList,
     }
   },
   data() {
     return {
-      recruiterList,
-      mediaList,
-      positionList,
       currentCard: null,
     };
   },
@@ -124,11 +121,37 @@ export default {
         this.$refs.nameField.focus()
       })
     },
+    update(field) {
+      // 更新したフィールドのみ更新を走らせる
+      const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
+      let candidate = {}
+      candidate[fieldSnakeCase] = this.currentCard[field]
+      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
   },
   computed: {
     currentColumn() {
-      return this.kanban.find(column => column.id === this.currentCard.columnId)
+      return this.kanban.find(column => column.id === this.currentCard.recruitmentSelectionId)
     }
+  },
+  // モーダル切替時にも更新が走ってしまうので要修正
+  watch: {
+    'currentCard.recruiter': function(recruiter) {
+      const candidate = { recruiter_id: recruiter?.id || null }
+      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
+    'currentCard.medium': function(medium) {
+      const candidate = { medium_id: medium?.id || null }
+      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
+    'currentCard.position': function(position) {
+      const candidate = { position_id: position?.id || null }
+      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
+    'currentCard.recruitmentStartedAt': function(date) {
+      const candidate = { recruitment_started_at: date }
+      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
   }
 }
 </script>

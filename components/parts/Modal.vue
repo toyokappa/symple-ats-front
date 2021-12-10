@@ -40,7 +40,7 @@ export default {
   &__window
     position: absolute
     top: 7.5%
-    max-height: 85%
+    height: 85%
     width: 70%
     max-width: 800px
     background-color: white
