@@ -7,7 +7,7 @@
     .flex.justify-end.mb-2
       input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="searchKeyword")
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchCategory" :class="dummyPlaceholder(searchCategory)")
-        option(:value="null" selected) 媒体種別で絞り込む
+        option(value="" selected) 媒体種別で絞り込む
         option(v-for="cat in categoryList" :value="cat.en" :key="cat.en") {{ cat.ja }}
       button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.addMediaModal.openModal()") 媒体を追加する
 
@@ -21,7 +21,7 @@
           parts-table-head-column 応募URL
       tbody.text-sm
         tr.cursor-pointer(
-          v-for="medium in media"
+          v-for="medium in searchedMedia"
           :key="medium.id"
           :class="'hover:bg-gray-100'"
           @click="openEditModal(medium)"
@@ -101,7 +101,7 @@ export default {
       categoryList,
       automationList,
       searchKeyword: '',
-      searchCategory: null,
+      searchCategory: '',
       addMedia: [
         {
           name: '',
@@ -167,6 +167,16 @@ export default {
     },
     automationJa(en) {
       return this.automationList.find(item => item.en === en).ja
+    }
+  },
+  computed: {
+    searchedMedia() {
+      return this.media.filter(medium => {
+        return (
+          medium.name.indexOf(this.searchKeyword) !== -1 &&
+          medium.category.indexOf(this.searchCategory) !== -1
+        )
+      })
     }
   },
   watch: {
