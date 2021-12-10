@@ -14,12 +14,12 @@ draggable(
   .bg-white.rounded.border.border-gray-200.shadow-sm.p-3.mb-2.cursor-pointer(v-for="card in cardList" :key="card.id" @click="openModal(card)")
     .text-sm(v-if="card.name") {{ card.name }}
     .text-sm.text-gray-300(v-else) 名前未入力
-    parts-recruiter.mt-1(:recruiterId="card.recruiterId")
-    .mt-1(v-if="card.mediaId")
-      parts-media(:mediaId="card.mediaId")
-    .mt-1(v-if="card.positionId")
-      parts-position(:positionId="card.positionId")
-    parts-date.text-xs.mt-2(:date="card.startedDate")
+    parts-recruiter.mt-1(:recruiter="card.recruiter")
+    .mt-1(v-if="card.medium")
+      parts-medium(:medium="card.medium")
+    .mt-1(v-if="card.position")
+      parts-position(:position="card.position")
+    parts-date.text-xs.mt-2(:date="new Date(card.recruitmentStartedAt)")
 </template>
 
 <script>

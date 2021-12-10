@@ -109,7 +109,7 @@ import { roles, levels } from '@/fixtures/recruiterList'
 
 export default {
   async asyncData({ $axios }) {
-    const { data } = await $axios.get('/users')
+    const { data } = await $axios.get('/recruiters')
     return {
       recruiterList: data
     }

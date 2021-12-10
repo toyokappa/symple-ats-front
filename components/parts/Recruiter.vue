@@ -8,8 +8,7 @@
 export default {
   props: {
     recruiter: {
-      type: Object,
-      required: true,
+      type: [Object, null],
     }
   },
 }

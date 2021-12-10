@@ -12,9 +12,9 @@ draggable(
     .bg-white.w-72.rounded.border.border-gray-200.mx-2(v-for="column in kanban" :key="column.id")
       .bg-gray-100.px-3.py-2.flex.justify-content-start.cursor-pointer
         h3.text-sm.mr-2 {{ column.name }}
-        .text-sm.text-gray-500 {{ column.list.length }}
+        .text-sm.text-gray-500 {{ column.candidates.length }}
       .bg-white.p-3
-        parts-kanban-card(:cardList="column.list" :columnId="column.id" :openModal="openModal")
+        parts-kanban-card(:cardList="column.candidates" :columnId="column.id" :openModal="openModal")
         .bg-white.rounded.border.border-gray-200.px-3.py-2.mb-2(v-show="createColumnId === column.id")
           input.text-sm.outline-none(
             type="text"
@@ -59,14 +59,14 @@ export default {
       if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
 
       const column = this.kanban.find(column => column.id === this.createColumnId)
-      column.list.push({
-        id: column.list.length + 1,
-        columnId: column.id,
+      column.candidates.push({
+        id: column.candidates.length + 1,
+        recruitmentSelectionId: column.id,
         name: this.nameField,
         recruiter: null,
         media: null,
         position: null,
-        startedDate: new Date()
+        recruitmentStartedAt: new Date(),
       })
       this.createColumnId = null
       this.nameField = ""
