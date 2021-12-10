@@ -33,20 +33,41 @@ export default [
   },
 ]
 
-export const categories = [
+export const categoryList = [
   {
-    id: 1,
-    name: '求人媒体',
-    color: 'green',
-  },
-  {
-    id: 2,
-    name: 'エージェント',
+    en: 'agent',
+    ja: 'エージェント',
     color: 'red',
   },
   {
-    id: 3,
-    name: 'SNS',
+    en: 'ad',
+    ja: '求人媒体',
+    color: 'green',
+  },
+  {
+    en: 'scout',
+    ja: 'スカウト',
+    color: 'yellow',
+  },
+  {
+    en: 'sns',
+    ja: 'SNS',
     color: 'blue',
-  }
+  },
+  {
+    en: 'referral',
+    ja: 'リファーラル',
+    color: 'purple',
+  },
+  {
+    en: 'other',
+    ja: 'その他',
+    color: 'gray',
+  },
+]
+
+export const automationList = [
+  { en: 'disable', ja: '未連携' },
+  { en: 'enable', ja: '連携済み' },
+  { en: 'impossible', ja: '連携不可' },
 ]

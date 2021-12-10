@@ -46,16 +46,16 @@
           v-model="addPosition.externalName"
           placeholder="外部効果用のポジション名"
         )
-        parts-button-remove-field(@removeEvent="removePosition(index)")
-      parts-button-add-field(@addEvent="addPosition()") + ポジションを更に追加する
-      parts-button-primary(@submitEvent="createPosition()") ポジションの追加を確定する
+        parts-button-remove-field(@removeEvent="remove(index)")
+      parts-button-add-field(@addEvent="add()") + ポジションを更に追加する
+      parts-button-primary(@submitEvent="create()") ポジションの追加を確定する
 
     //- 詳細/編集UI
     parts-modal(ref="positionEditModal")
       template(v-if="currentPosition")
         parts-form-title-like-text-field(
           v-model="currentPosition.internalName"
-          @updateEvent="updatePosition('internalName')"
+          @updateEvent="update('internalName')"
           ref="nameField"
         )
         .grid.grid-cols-9.mb-2.items-center
@@ -64,7 +64,7 @@
           .col-start-3.col-span-7
             parts-form-text-like-text-field(
               v-model="currentPosition.externalName"
-              @updateEvent="updatePosition('externalName')"
+              @updateEvent="update('externalName')"
             )
         .grid.grid-cols-9.mb-2.items-center
           .col-span-2
@@ -113,14 +113,14 @@ export default {
     dummyPlaceholder(value) {
       return !value ? 'text-gray-300' : ''
     },
-    addPosition() {
+    add() {
       const position = { internalName: '', externalName: '' }
       this.addPositionList = [...this.addPositionList, position]
     },
-    removePosition(index) {
+    remove(index) {
       this.addPositionList.splice(index, 1)
     },
-    createPosition() {
+    create() {
       if (this.addPositionList.length === 0) return
       // TODO: バリデーションロジックは追加する
 
@@ -146,7 +146,7 @@ export default {
       this.addPositionList = [{ internalName: '', externalName: '' }]
       this.$refs.addPositionModal.closeModal()
     },
-    updatePosition(field) {
+    update(field) {
       // 更新したフィールドのみ更新を走らせる
       const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
       let position = {}
@@ -178,7 +178,7 @@ export default {
   watch: {
     // 更新したフィールドのみ更新を走らせる
     'currentPosition.status': function() {
-      this.updatePosition('status')
+      this.update('status')
     }
   }
 }
