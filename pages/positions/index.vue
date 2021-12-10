@@ -5,10 +5,10 @@
 
     //- 検索UI
     .flex.justify-end.mb-2
-      input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="keyword")
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="status" :class="dummyPlaceholder(status)")
+      input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="searchKeyword")
+      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchStatus" :class="dummyPlaceholder(searchStatus)")
         option(value="" selected) 公開状態で絞り込む
-        option(v-for="state in statusList" :value="state.en" :key="state.en") {{ state.ja }}
+        option(v-for="status in statusList" :value="status.en" :key="status.en") {{ status.ja }}
       button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.addPositionModal.openModal()") ポジションを追加する
 
     //- 一覧UI
@@ -20,7 +20,7 @@
           parts-table-head-column 公開状態
       tbody.text-sm
         tr.cursor-pointer(
-          v-for="position in positionList"
+          v-for="position in searchedPositionList"
           :key="position.id"
           :class="'hover:bg-gray-100'"
           @click="openEditModal(position)"
@@ -98,8 +98,8 @@ export default {
   data() {
     return {
       statusList,
-      keyword: '',
-      status: '',
+      searchKeyword: '',
+      searchStatus: '',
       addPositionList: [
         {
           internalName: '',
@@ -166,6 +166,17 @@ export default {
       } else {
         return '非公開'
       }
+    }
+  },
+  computed: {
+    searchedPositionList() {
+      return this.positionList.filter(position => {
+        return (
+          (position.internalName.indexOf(this.searchKeyword) !== -1 ||
+          position.externalName.indexOf(this.searchKeyword) !== -1) &&
+          position.status.indexOf(this.searchStatus) !== -1
+        )
+      })
     }
   },
   watch: {
