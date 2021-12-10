@@ -4,3 +4,9 @@ button.block.ml-auto.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(
 )
   slot
 </template>
+
+<script>
+export default {
+  
+}
+</script>

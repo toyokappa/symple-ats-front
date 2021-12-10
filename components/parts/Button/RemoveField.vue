@@ -3,3 +3,9 @@
   @click="$emit('removeEvent')"
 ) ×
 </template>
+
+<script>
+export default {
+  
+}
+</script>

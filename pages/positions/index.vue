@@ -53,25 +53,18 @@
     //- 詳細/編集UI
     parts-modal(ref="positionEditModal")
       template(v-if="currentPosition")
-        input.text-3xl.font-bold.outline-none.placeholder-gray-300.mb-5(
-          type="text"
+        parts-form-title-like-text-field(
           v-model="currentPosition.internalName"
-          placeholder="名前未入力"
+          @updateEvent="updatePosition('internalName')"
           ref="nameField"
-          name="internalName"
-          @blur="updatePosition"
         )
         .grid.grid-cols-9.mb-2.items-center
           .col-span-2
             .text-sm 外部公開用の名前
           .col-start-3.col-span-7
-            input.text-sm.w-full.rounded.outline-none.border.border-transparent.placeholder-gray-300.px-2.py-1(
-              type="text"
+            parts-form-text-like-text-field(
               v-model="currentPosition.externalName"
-              :class="'hover:bg-gray-100 focus:bg-white focus:shadow-lg focus:border-gray-100'"
-              placeholder="未入力"
-              name="externalName"
-              @blur="updatePosition"
+              @updateEvent="updatePosition('externalName')"
             )
         .grid.grid-cols-9.mb-2.items-center
           .col-span-2
@@ -153,9 +146,8 @@ export default {
       this.addPositionList = [{ internalName: '', externalName: '' }]
       this.$refs.addPositionModal.closeModal()
     },
-    updatePosition(event) {
+    updatePosition(field) {
       // 更新したフィールドのみ更新を走らせる
-      const field = event.target.name
       const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
       let position = {}
       position[fieldSnakeCase] = this.currentPosition[field]
@@ -178,8 +170,8 @@ export default {
   },
   watch: {
     // 更新したフィールドのみ更新を走らせる
-    'currentPosition.status': function(val) {
-      this.$axios.put(`/positions/${this.currentPosition.id}`, { position: { status: val } })
+    'currentPosition.status': function() {
+      this.updatePosition('status')
     }
   }
 }
