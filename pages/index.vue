@@ -99,12 +99,17 @@
 
 <script>
 // TODO: データ基盤ができたらいずれは削除
-import { kanban, recruiterList, mediaList, positionList } from '@/fixtures'
+import { recruiterList, mediaList, positionList } from '@/fixtures'
 
 export default {
+  async asyncData({ $axios }) {
+    const { data } = await $axios.get('/recruitment_selections')
+    return {
+      kanban: data
+    }
+  },
   data() {
     return {
-      kanban,
       recruiterList,
       mediaList,
       positionList,
