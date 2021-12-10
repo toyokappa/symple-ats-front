@@ -160,12 +160,8 @@ export default {
         this.$refs.nameField.focus()
       })
     },
-    statusJa(status) {
-      if (status === 'open') {
-        return '公開中'
-      } else {
-        return '非公開'
-      }
+    statusJa(statusEn) {
+      return this.statusList.find(status => status.en === statusEn).ja
     }
   },
   computed: {
