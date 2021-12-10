@@ -43,19 +43,12 @@
         )
         input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
           type="text"
-          v-model="addPosition.outsideName"
+          v-model="addPosition.externalName"
           placeholder="外部効果用のポジション名"
         )
-        .text-sm.text-gray-300.border.border-gray-200.rounded.px-2.py-1.cursor-pointer(
-          @click="removePosition(index)"
-        ) ×
-      .text-sm.text-gray-300.w-full.border.border-gray-200.rounded.px-2.py-1.cursor-pointer.mb-2(
-        @click="addPosition()"
-      ) + ポジションを更に追加する
-      .text-right
-        button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(
-          @click="createPosition()"
-        ) ポジションの追加を確定する
+        parts-button-remove-field(@removeEvent="removePosition(index)")
+      parts-button-add-field(@addEvent="addPosition()") + ポジションを更に追加する
+      parts-button-primary(@submitEvent="createPosition()") ポジションの追加を確定する
 
     //- 詳細/編集UI
     parts-modal(ref="positionEditModal")
@@ -138,6 +131,7 @@ export default {
       if (this.addPositionList.length === 0) return
       // TODO: バリデーションロジックは追加する
 
+      // データ通信
       this.addPositionList.forEach(position => {
         this.$axios.post('/positions', {
           position: {
@@ -146,16 +140,21 @@ export default {
           }
         })
       })
+
+      // 画面描画
       const newPositionList = this.addPositionList.map((position, index) => {
         position.id = this.positionList.length + index + 1
         position.status = 'open'
         return position
       })
       this.positionList = this.positionList.concat(newPositionList)
+
+      // 初期化
       this.addPositionList = [{ internalName: '', externalName: '' }]
       this.$refs.addPositionModal.closeModal()
     },
     updatePosition(event) {
+      // 更新したフィールドのみ更新を走らせる
       const field = event.target.name
       const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
       let position = {}
@@ -178,6 +177,7 @@ export default {
     }
   },
   watch: {
+    // 更新したフィールドのみ更新を走らせる
     'currentPosition.status': function(val) {
       this.$axios.put(`/positions/${this.currentPosition.id}`, { position: { status: val } })
     }
