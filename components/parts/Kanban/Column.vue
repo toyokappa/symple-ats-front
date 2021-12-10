@@ -54,20 +54,19 @@ export default {
         this.$refs[`column${columnId}`][0].focus()
       })
     },
-    appendCard(event) {
+    async appendCard(event) {
       if (event.keyCode && event.keyCode !== 13) return // 日本語変換確定のエンターは対象外
       if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
 
-      const column = this.kanban.find(column => column.id === this.createColumnId)
-      column.candidates.push({
-        id: column.candidates.length + 1,
-        recruitmentSelectionId: column.id,
-        name: this.nameField,
-        recruiter: null,
-        media: null,
-        position: null,
-        recruitmentStartedAt: new Date(),
+      const { data } = await this.$axios.post('/candidates', {
+        candidate: {
+          recruitment_selection_id: this.createColumnId,
+          name: this.nameField,
+        }
       })
+
+      const column = this.kanban.find(column => column.id === this.createColumnId)
+      column.candidates.push(data)
       this.createColumnId = null
       this.nameField = ""
     }
