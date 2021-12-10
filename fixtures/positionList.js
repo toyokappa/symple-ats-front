@@ -22,4 +22,7 @@ export default [
   },
 ]
 
-export const statusList = ['公開中', '非公開']
+export const statusList = [
+  { en: 'open', ja: '公開中' },
+  { en: 'close', ja: '非公開' },
+]
