@@ -56,7 +56,7 @@
             template(v-slot:option="option")
               parts-position(:position="option")
       .grid.grid-cols-6.mb-3.items-center
-        .text-sm 選考開始日
+        .text-sm 応募日
         .col-start-2.col-span-5
           v-date-picker(
             v-model="currentCard.recruitmentStartedAt"
