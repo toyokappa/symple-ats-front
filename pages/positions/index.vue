@@ -78,6 +78,7 @@
               label="ja"
               :class="'v-select-custom-style'"
               name="status"
+              @input="update('status')"
             )
               template(#selected-option="option")
                 .text-sm {{ option.ja }}
@@ -171,12 +172,6 @@ export default {
       })
     }
   },
-  watch: {
-    // 更新したフィールドのみ更新を走らせる
-    'currentPosition.status': function() {
-      this.update('status')
-    }
-  }
 }
 </script>
 

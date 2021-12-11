@@ -75,6 +75,7 @@
               :reduce="category => category.en"
               label="ja"
               :class="'v-select-custom-style'"
+              @input="update('category')"
             )
               template(#selected-option="option")
                 .inline-block.text-xs.text-black.rounded.px-2(
@@ -175,12 +176,6 @@ export default {
       })
     }
   },
-  watch: {
-    // 更新したフィールドのみ更新を走らせる
-    'currentMedium.category': function() {
-      this.update('category')
-    }
-  }
 }
 </script>
 
