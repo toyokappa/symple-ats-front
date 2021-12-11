@@ -63,7 +63,9 @@
       .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="history in currentCard.recruitmentHistories" :key="history.id")
         .bg-gray-100.px-3.py-2.flex.justify-content-start.items-center
           h3.text-sm.mr-5 {{ findColumn(history.recruitmentSelectionId).name }}
-          .text-sm.text-gray-500
+          .text-sm.text-gray-500(
+            v-if="['document', 'interview'].includes(findColumn(history.recruitmentSelectionId).selectionType)"
+          )
             v-select.text-sm.text-gray-500.w-32(
               v-model="history.result"
               placeholder="未選考"
@@ -108,7 +110,6 @@
 </template>
 
 <script>
-// TODO: データ基盤ができたらいずれは削除
 export default {
   async asyncData({ $axios }) {
     const { data: kanban } = await $axios.get('/recruitment_selections')

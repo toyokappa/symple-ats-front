@@ -24,7 +24,10 @@ draggable(
             @keydown.enter="appendCard"
             @blur="appendCard"
           )
-        .bg-white.rounded.border.border-gray-200.px-3.py-2.cursor-pointer(@click="displayCreateForm(column.id)")
+        .bg-white.rounded.border.border-gray-200.px-3.py-2.cursor-pointer(
+          v-if="['document', 'interview', 'offer', 'consent'].includes(column.selectionType)"
+          @click="displayCreateForm(column.id)"
+        )
           .text-sm.text-gray-400 + 新規作成
 </template>
 
@@ -58,17 +61,23 @@ export default {
       if (event.keyCode && event.keyCode !== 13) return // 日本語変換確定のエンターは対象外
       if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
 
+      const column = this.kanban.find(column => column.id === this.createColumnId)
       const { data } = await this.$axios.post('/candidates', {
         candidate: {
-          recruitment_selection_id: this.createColumnId,
+          recruitment_selection_id: column.id,
           name: this.nameField,
-        }
+        },
+        require_selection_ids: this.requireSelectionIds(column.position)
       })
 
-      const column = this.kanban.find(column => column.id === this.createColumnId)
       column.candidates.push(data)
       this.createColumnId = null
       this.nameField = ""
+    },
+    requireSelectionIds(selectionPosition) {
+      return this.kanban
+        .filter(column => column.position <= selectionPosition)
+        .map(column => column.id)
     }
   },
 }
