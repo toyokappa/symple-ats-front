@@ -19,7 +19,7 @@ draggable(
       parts-medium(:medium="card.medium")
     .mt-1(v-if="card.position")
       parts-position(:position="card.position")
-    parts-date.text-xs.mt-2(:date="new Date(card.recruitmentStartedAt)")
+    //- parts-date.text-xs.mt-2(:date="new Date(card.recruitmentStartedAt)")
 </template>
 
 <script>
