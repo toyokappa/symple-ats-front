@@ -22,6 +22,7 @@
             :options="recruiterList"
             label="nickname"
             :class="'v-select-custom-style'"
+            @input="updateAssociation('recruiter')"
           )
             template(#selected-option="option")
               parts-recruiter(:recruiter="option")
@@ -36,6 +37,7 @@
             :options="media"
             label="name"
             :class="'v-select-custom-style'"
+            @input="updateAssociation('medium')"
           )
             template(#selected-option="option")
               parts-medium(:medium="option")
@@ -50,6 +52,7 @@
             :options="positionList"
             label="internalName"
             :class="'v-select-custom-style'"
+            @input="updateAssociation('position')"
           )
             template(#selected-option="option")
               parts-position(:position="option")
@@ -140,6 +143,13 @@ export default {
       candidate[fieldSnakeCase] = this.currentCard[field]
       this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
     },
+    updateAssociation(association) {
+      // 更新したフィールドのみ更新を走らせる
+      const acSnakeCase = association.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
+      let candidate = {}
+      candidate[`${acSnakeCase}_id`] = this.currentCard[association].id
+      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
     findColumn(columnId) {
       return this.kanban.find(column => column.id == columnId)
     }
@@ -149,25 +159,6 @@ export default {
       return this.kanban.find(column => column.id === this.currentCard.recruitmentSelectionId)
     }
   },
-  // モーダル切替時にも更新が走ってしまうので要修正
-  watch: {
-    'currentCard.recruiter': function(recruiter) {
-      const candidate = { recruiter_id: recruiter?.id || null }
-      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
-    },
-    'currentCard.medium': function(medium) {
-      const candidate = { medium_id: medium?.id || null }
-      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
-    },
-    'currentCard.position': function(position) {
-      const candidate = { position_id: position?.id || null }
-      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
-    },
-    'currentCard.recruitmentStartedAt': function(date) {
-      const candidate = { recruitment_started_at: date }
-      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
-    },
-  }
 }
 </script>
 
