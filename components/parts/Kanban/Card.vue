@@ -4,7 +4,7 @@ draggable(
   group="kanban"
   @start="drag = true"
   @end="drag = false"
-  @change="updateColumnId"
+  @change="sort"
   ghostClass="ghost"
   :animation="200"
   :disabled="false",
@@ -44,13 +44,19 @@ export default {
     };
   },
   methods: {
-    updateColumnId({ added }) {
-      this.cardList.forEach(card => {
-        if (card.columnId !== this.columnId) {
-          card.columnId = this.columnId
+    sort({ added, moved, removed }) {
+      if (removed) return
+
+      const { element, newIndex } = added || moved
+      this.$axios.put(`/candidates/${element.id}/position`, {
+        candidate: {
+          recruitment_selection_id: this.columnId,
+          list_position: newIndex + 1
         }
       })
-    }
+      const card = this.cardList.find(card => card.id === element.id)
+      card.recruitmentSelectionId = this.columnId
+    },
   }
 }
 </script>
