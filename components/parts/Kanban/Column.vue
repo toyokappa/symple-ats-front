@@ -14,7 +14,11 @@ draggable(
         h3.text-sm.mr-2 {{ column.name }}
         .text-sm.text-gray-500 {{ column.candidates.length }}
       .bg-white.p-3
-        parts-kanban-card(:cardList="column.candidates" :columnId="column.id" :openModal="openModal")
+        parts-kanban-card(
+          :cardList="column.candidates"
+          :columnId="column.id"
+          :openModal="openModal"
+        )
         .bg-white.rounded.border.border-gray-200.px-3.py-2.mb-2(v-show="createColumnId === column.id")
           input.text-sm.outline-none(
             type="text"
@@ -67,18 +71,12 @@ export default {
           recruitment_selection_id: column.id,
           name: this.nameField,
         },
-        require_selection_ids: this.requireSelectionIds(column.position)
       })
 
       column.candidates.push(data)
       this.createColumnId = null
       this.nameField = ""
     },
-    requireSelectionIds(selectionPosition) {
-      return this.kanban
-        .filter(column => column.position <= selectionPosition)
-        .map(column => column.id)
-    }
   },
 }
 </script>

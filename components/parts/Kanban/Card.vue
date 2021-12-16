@@ -52,7 +52,7 @@ export default {
         candidate: {
           recruitment_selection_id: this.columnId,
           list_position: newIndex + 1
-        }
+        },
       })
       const card = this.cardList.find(card => card.id === element.id)
       card.recruitmentSelectionId = this.columnId
