@@ -127,7 +127,7 @@ export default {
   data() {
     return {
       currentCard: null,
-    };
+    }
   },
   methods: {
     openModal(card) {
@@ -139,29 +139,36 @@ export default {
     },
     update(field) {
       // 更新したフィールドのみ更新を走らせる
-      const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
+      const fieldSnakeCase = field.replace(
+        /[A-Z]/g,
+        (s) => '_' + s[0].toLowerCase()
+      )
       let candidate = {}
       candidate[fieldSnakeCase] = this.currentCard[field]
       this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
     },
     updateAssociation(association) {
       // 更新したフィールドのみ更新を走らせる
-      const acSnakeCase = association.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
+      const acSnakeCase = association.replace(
+        /[A-Z]/g,
+        (s) => '_' + s[0].toLowerCase()
+      )
       let candidate = {}
       candidate[`${acSnakeCase}_id`] = this.currentCard[association].id
       this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
     },
     findColumn(columnId) {
-      return this.kanban.find(column => column.id == columnId)
-    }
+      return this.kanban.find((column) => column.id == columnId)
+    },
   },
   computed: {
     currentColumn() {
-      return this.kanban.find(column => column.id === this.currentCard.recruitmentSelectionId)
-    }
+      return this.kanban.find(
+        (column) => column.id === this.currentCard.recruitmentSelectionId
+      )
+    },
   },
 }
 </script>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>

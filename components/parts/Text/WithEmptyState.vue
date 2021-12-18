@@ -8,8 +8,8 @@
 export default {
   props: {
     attribute: {
-      type: [String, Number, null]
-    }
-  }
+      type: [String, Number, null],
+    },
+  },
 }
 </script>

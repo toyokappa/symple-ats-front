@@ -94,7 +94,7 @@ export default {
   async asyncData({ $axios }) {
     const { data } = await $axios.get('/media')
     return {
-      media: data
+      media: data,
     }
   },
   data() {
@@ -128,15 +128,17 @@ export default {
       // TODO: バリデーションロジックは追加する
 
       // データ通信
-      const newMedia = await Promise.all(this.addMedia.map(async medium => {
-        const { data } = await this.$axios.post('/media', {
-          medium: {
-            name: medium.name,
-            category: medium.category
-          }
+      const newMedia = await Promise.all(
+        this.addMedia.map(async (medium) => {
+          const { data } = await this.$axios.post('/media', {
+            medium: {
+              name: medium.name,
+              category: medium.category,
+            },
+          })
+          return data
         })
-        return data
-      }))
+      )
 
       // 画面描画
       this.media = this.media.concat(newMedia)
@@ -147,7 +149,10 @@ export default {
     },
     update(field) {
       // 更新したフィールドのみ更新を走らせる
-      const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
+      const fieldSnakeCase = field.replace(
+        /[A-Z]/g,
+        (s) => '_' + s[0].toLowerCase()
+      )
       let medium = {}
       medium[fieldSnakeCase] = this.currentMedium[field]
       this.$axios.put(`/media/${this.currentMedium.id}`, { medium })
@@ -160,24 +165,23 @@ export default {
       })
     },
     category(categoryEn) {
-      return this.categoryList.find(category => category.en === categoryEn)
+      return this.categoryList.find((category) => category.en === categoryEn)
     },
     automationJa(en) {
-      return this.automationList.find(item => item.en === en).ja
-    }
+      return this.automationList.find((item) => item.en === en).ja
+    },
   },
   computed: {
     searchedMedia() {
-      return this.media.filter(medium => {
+      return this.media.filter((medium) => {
         return (
           medium.name.indexOf(this.searchKeyword) !== -1 &&
           medium.category.indexOf(this.searchCategory) !== -1
         )
       })
-    }
+    },
   },
 }
 </script>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>

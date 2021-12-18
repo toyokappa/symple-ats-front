@@ -111,7 +111,7 @@ export default {
   async asyncData({ $axios }) {
     const { data } = await $axios.get('/recruiters')
     return {
-      recruiterList: data
+      recruiterList: data,
     }
   },
   data() {
@@ -161,10 +161,9 @@ export default {
       this.$nextTick(() => {
         this.$refs.nameField.focus()
       })
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>

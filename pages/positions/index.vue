@@ -93,7 +93,7 @@ export default {
   async asyncData({ $axios }) {
     const { data } = await $axios.get('/positions')
     return {
-      positionList: data
+      positionList: data,
     }
   },
   data() {
@@ -126,15 +126,17 @@ export default {
       // TODO: バリデーションロジックは追加する
 
       // データ通信
-      const newPositionList = await Promise.all(this.addPositionList.map(async position => {
-        const { data } = await this.$axios.post('/positions', {
-          position: {
-            internal_name: position.internalName,
-            external_name: position.externalName,
-          }
+      const newPositionList = await Promise.all(
+        this.addPositionList.map(async (position) => {
+          const { data } = await this.$axios.post('/positions', {
+            position: {
+              internal_name: position.internalName,
+              external_name: position.externalName,
+            },
+          })
+          return data
         })
-        return data
-      }))
+      )
 
       // 画面描画
       this.positionList = this.positionList.concat(newPositionList)
@@ -145,7 +147,10 @@ export default {
     },
     update(field) {
       // 更新したフィールドのみ更新を走らせる
-      const fieldSnakeCase = field.replace(/[A-Z]/g, s => '_' + s[0].toLowerCase())
+      const fieldSnakeCase = field.replace(
+        /[A-Z]/g,
+        (s) => '_' + s[0].toLowerCase()
+      )
       let position = {}
       position[fieldSnakeCase] = this.currentPosition[field]
       this.$axios.put(`/positions/${this.currentPosition.id}`, { position })
@@ -158,22 +163,21 @@ export default {
       })
     },
     statusJa(statusEn) {
-      return this.statusList.find(status => status.en === statusEn).ja
-    }
+      return this.statusList.find((status) => status.en === statusEn).ja
+    },
   },
   computed: {
     searchedPositionList() {
-      return this.positionList.filter(position => {
+      return this.positionList.filter((position) => {
         return (
           (position.internalName.indexOf(this.searchKeyword) !== -1 ||
-          position.externalName.indexOf(this.searchKeyword) !== -1) &&
+            position.externalName.indexOf(this.searchKeyword) !== -1) &&
           position.status.indexOf(this.searchStatus) !== -1
         )
       })
-    }
+    },
   },
 }
 </script>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>

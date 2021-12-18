@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { analytics, positionList } from "@/fixtures"
+import { analytics, positionList } from '@/fixtures'
 
 export default {
   data() {
@@ -48,15 +48,17 @@ export default {
       analytics,
       positionList,
       filter: {
-        section: "",
-        position: "",
+        section: '',
+        position: '',
       },
-      currentDatasetsIndex: 0
+      currentDatasetsIndex: 0,
     }
   },
   methods: {
     filterDisplayValues(index) {
-      return this.analytics.datasets[index].values.filter((_, index) => index < this.dataValues.length - 1)
+      return this.analytics.datasets[index].values.filter(
+        (_, index) => index < this.dataValues.length - 1
+      )
     },
     selectDatasets(index) {
       this.currentDatasetsIndex = index
@@ -73,26 +75,32 @@ export default {
       return this.analytics.labels
     },
     displayValues() {
-      return this.dataValues.filter((_, index) => index < this.dataValues.length - 1)
+      return this.dataValues.filter(
+        (_, index) => index < this.dataValues.length - 1
+      )
     },
     displayLabels() {
-      return this.chartLabels.filter((_, index) => index < this.chartLabels.length - 1)
+      return this.chartLabels.filter(
+        (_, index) => index < this.chartLabels.length - 1
+      )
     },
     valuePercentage() {
-      return this.dataValues.map((value, index) => (this.dataValues[index + 1] / value * 100).toFixed(1))
+      return this.dataValues.map((value, index) =>
+        ((this.dataValues[index + 1] / value) * 100).toFixed(1)
+      )
     },
     mediaSelection() {
-      return this.analytics.datasets.map(data => data.dataName)
+      return this.analytics.datasets.map((data) => data.dataName)
     },
     chartData() {
       return {
         datasets: [
           {
             data: this.dataValues,
-            label: '候補者数'
-          }
+            label: '候補者数',
+          },
         ],
-        labels: this.chartLabels
+        labels: this.chartLabels,
       }
     },
     options() {
@@ -101,38 +109,41 @@ export default {
           display: false,
         },
         labels: {
-          display: false
+          display: false,
         },
         scales: {
-          xAxes: [{
-            ticks: {
-              display: false
-            }
-          }],
-          yAxes: [{
-            ticks: {
-              display: false,
-              beginAtZero: true,
+          xAxes: [
+            {
+              ticks: {
+                display: false,
+              },
             },
-            gridLines: {
-              display: false,
-              drawTicks: false
-            }
-          }],
+          ],
+          yAxes: [
+            {
+              ticks: {
+                display: false,
+                beginAtZero: true,
+              },
+              gridLines: {
+                display: false,
+                drawTicks: false,
+              },
+            },
+          ],
         },
         elements: {
           line: {
-            tension: 0
+            tension: 0,
           },
           point: {
-            radius: 0
-          }
+            radius: 0,
+          },
         },
       }
     },
-  }
+  },
 }
 </script>
 
-<style lang="sass" scoped>
-</style>
+<style lang="sass" scoped></style>

@@ -40,24 +40,24 @@ export default {
   props: {
     kanban: {
       type: Array,
-      required: true
+      required: true,
     },
     openModal: {
       type: Function,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     return {
       drag: false,
       createColumnId: null,
-      nameField: ""
-    };
+      nameField: '',
+    }
   },
   methods: {
     displayCreateForm(columnId) {
       this.createColumnId = columnId
-      this.$nextTick(() =>{
+      this.$nextTick(() => {
         this.$refs[`column${columnId}`][0].focus()
       })
     },
@@ -65,7 +65,9 @@ export default {
       if (event.keyCode && event.keyCode !== 13) return // 日本語変換確定のエンターは対象外
       if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
 
-      const column = this.kanban.find(column => column.id === this.createColumnId)
+      const column = this.kanban.find(
+        (column) => column.id === this.createColumnId
+      )
       const { data } = await this.$axios.post('/candidates', {
         candidate: {
           recruitment_selection_id: column.id,
@@ -75,7 +77,7 @@ export default {
 
       column.candidates.push(data)
       this.createColumnId = null
-      this.nameField = ""
+      this.nameField = ''
     },
   },
 }

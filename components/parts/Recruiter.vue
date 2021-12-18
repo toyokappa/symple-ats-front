@@ -9,7 +9,7 @@ export default {
   props: {
     recruiter: {
       type: [Object, null],
-    }
+    },
   },
 }
 </script>

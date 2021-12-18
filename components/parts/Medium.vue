@@ -10,7 +10,7 @@ export default {
   props: {
     medium: {
       type: [Object, null],
-    }
+    },
   },
   data() {
     return {
@@ -19,8 +19,10 @@ export default {
   },
   computed: {
     category() {
-      return this.categoryList.find(category => category.en === this.medium.category)
-    }
-  }
+      return this.categoryList.find(
+        (category) => category.en === this.medium.category
+      )
+    },
+  },
 }
 </script>

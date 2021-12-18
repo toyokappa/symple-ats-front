@@ -28,8 +28,4 @@ export const roles = [
   { name: '閲覧者', value: 10 },
 ]
 
-export const levels = [
-  1,
-  2,
-  3,
-]
+export const levels = [1, 2, 3]

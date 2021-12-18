@@ -31,17 +31,17 @@ export default {
     },
     columnId: {
       type: Number,
-      required: true
+      required: true,
     },
     openModal: {
       type: Function,
       required: true,
-    }
+    },
   },
   data() {
     return {
       drag: false,
-    };
+    }
   },
   methods: {
     sort({ added, moved, removed }) {
@@ -51,13 +51,13 @@ export default {
       this.$axios.put(`/candidates/${element.id}/position`, {
         candidate: {
           recruitment_selection_id: this.columnId,
-          list_position: newIndex + 1
+          list_position: newIndex + 1,
         },
       })
-      const card = this.cardList.find(card => card.id === element.id)
+      const card = this.cardList.find((card) => card.id === element.id)
       card.recruitmentSelectionId = this.columnId
     },
-  }
+  },
 }
 </script>
 

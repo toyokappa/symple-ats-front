@@ -13,13 +13,13 @@ export default {
   props: {
     value: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   methods: {
     focus() {
       this.$refs.field.focus()
-    }
+    },
   },
   computed: {
     // 親コンポーネントからv-modelで引き継いだものがread-onlyなのでmutableに書き換える
@@ -28,9 +28,9 @@ export default {
         return this.value
       },
       set(newValue) {
-        this.$emit("input", newValue)
-      }
-    }
-  }
+        this.$emit('input', newValue)
+      },
+    },
+  },
 }
 </script>

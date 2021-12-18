@@ -6,7 +6,5 @@ button.block.ml-auto.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(
 </template>
 
 <script>
-export default {
-  
-}
+export default {}
 </script>

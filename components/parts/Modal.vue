@@ -10,7 +10,7 @@ transition(v-if="modalFlag" name="modal" appear)
 export default {
   data() {
     return {
-      modalFlag: false
+      modalFlag: false,
     }
   },
   methods: {
@@ -19,8 +19,8 @@ export default {
     },
     closeModal() {
       this.modalFlag = false
-    }
-  }
+    },
+  },
 }
 </script>
 

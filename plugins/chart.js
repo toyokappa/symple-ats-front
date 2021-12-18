@@ -1,7 +1,7 @@
-import Vue from 'vue';
-import { Line, mixins } from 'vue-chartjs';
+import Vue from 'vue'
+import { Line, mixins } from 'vue-chartjs'
 
-const { reactiveProp } = mixins;
+const { reactiveProp } = mixins
 
 Vue.component('line-chart', {
   extends: Line,
@@ -17,6 +17,6 @@ Vue.component('line-chart', {
     },
   },
   mounted() {
-    this.renderChart(this.chartData, this.options);
+    this.renderChart(this.chartData, this.options)
   },
-});
+})

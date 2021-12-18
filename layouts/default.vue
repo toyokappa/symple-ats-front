@@ -21,5 +21,4 @@ div
       nuxt
 </template>
 
-<style lang="sass">
-</style>
+<style lang="sass"></style>
