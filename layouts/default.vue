@@ -12,7 +12,7 @@ div
         li.mb-3
           n-link(to="/recruiters") リクルーター管理
         li.mb-3
-          n-link(to="/media") 媒体管理
+          n-link(to="/channels") チャネル管理
         li.mb-3
           n-link(to="/positions") ポジション管理
     .flex-auto(

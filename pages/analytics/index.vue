@@ -3,8 +3,8 @@
   .p-8
     .flex.justify-end.mb-2
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.section" :class="dummyPlaceholder(filter.section)")
-        option(value="" selected) 媒体区分で絞り込む
-        option(v-for="media in mediaSelection" :value="media" :key="media") {{ media }}
+        option(value="" selected) チャネル種別で絞り込む
+        option(v-for="channels in channelsSelection" :value="channels" :key="channels") {{ channels }}
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.position" :class="dummyPlaceholder(filter.position)")
         option(value="" selected) ポジションで絞り込む
         option(v-for="position in positionList" :value="position.name" :key="position.id") {{ position.name }}
@@ -89,7 +89,7 @@ export default {
         ((this.dataValues[index + 1] / value) * 100).toFixed(1)
       )
     },
-    mediaSelection() {
+    channelsSelection() {
       return this.analytics.datasets.map((data) => data.dataName)
     },
     chartData() {

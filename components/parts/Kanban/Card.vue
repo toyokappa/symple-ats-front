@@ -15,8 +15,8 @@ draggable(
     .text-sm(v-if="card.name") {{ card.name }}
     .text-sm.text-gray-300(v-else) 名前未入力
     parts-recruiter.mt-1(:recruiter="card.recruiter")
-    .mt-1(v-if="card.medium")
-      parts-medium(:medium="card.medium")
+    .mt-1(v-if="card.channel")
+      parts-channel(:channel="card.channel")
     .mt-1(v-if="card.position")
       parts-position(:position="card.position")
     //- parts-date.text-xs.mt-2(:date="new Date(card.recruitmentStartedAt)")

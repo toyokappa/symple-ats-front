@@ -32,17 +32,17 @@
         .text-sm 応募媒体
         .col-start-2.col-span-5
           v-select.text-sm.text-gray-300(
-            v-model="currentCard.medium"
+            v-model="currentCard.channel"
             placeholder="未入力"
-            :options="media"
+            :options="channels"
             label="name"
             :class="'v-select-custom-style'"
-            @input="updateAssociation('medium')"
+            @input="updateAssociation('channel')"
           )
             template(#selected-option="option")
-              parts-medium(:medium="option")
+              parts-channel(:channel="option")
             template(v-slot:option="option")
-              parts-medium(:medium="option")
+              parts-channel(:channel="option")
       .grid.grid-cols-6.mb-2.items-center
         .text-sm ポジション
         .col-start-2.col-span-5
@@ -114,13 +114,13 @@ export default {
   async asyncData({ $axios }) {
     const { data: kanban } = await $axios.get('/recruitment_selections')
     const { data: recruiterList } = await $axios.get('/recruiters')
-    const { data: media } = await $axios.get('/media')
+    const { data: channels } = await $axios.get('/channels')
     const { data: positionList } = await $axios.get('/positions')
 
     return {
       kanban,
       recruiterList,
-      media,
+      channels,
       positionList,
     }
   },
