@@ -73,6 +73,7 @@
               :reduce="option => option.value"
               label="label"
               :class="'v-select-custom-style-bg-gray'"
+              @input="updateHistory(history, 'result')"
             )
               template(#selected-option="option")
                 .text-gray-500 {{ option.label }}
@@ -82,6 +83,7 @@
               :masks="{ input: 'YYYY.MM.DD' }"
               :popover="{ visibility: 'focus' }"
               trim-weeks
+              @input="updateHistory(history, 'selectedAt')"
             )
               template(v-slot="{ inputValue, inputEvents }")
                 input.text-sm.text-right.w-24.px-2.py-1.outline-none.rounded.bg-gray-100(
@@ -156,6 +158,18 @@ export default {
       let candidate = {}
       candidate[`${acSnakeCase}_id`] = this.currentCard[association].id
       this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+    },
+    updateHistory(currentHistory, field) {
+      // 更新したフィールドのみ更新を走らせる
+      const fieldSnakeCase = field.replace(
+        /[A-Z]/g,
+        (s) => '_' + s[0].toLowerCase()
+      )
+      let history = {}
+      history[fieldSnakeCase] = currentHistory[field]
+      this.$axios.put(`/recruitment_histories/${currentHistory.id}`, {
+        history,
+      })
     },
     findColumn(columnId) {
       return this.kanban.find((column) => column.id == columnId)
