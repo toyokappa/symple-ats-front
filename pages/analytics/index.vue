@@ -40,12 +40,17 @@
 </template>
 
 <script>
-import { analytics, positionList } from '@/fixtures'
+import { positionList } from '@/fixtures'
 
 export default {
-  data() {
+  async asyncData({ $axios }) {
+    const { data: analytics } = await $axios.get('/analytics')
     return {
       analytics,
+    }
+  },
+  data() {
+    return {
       positionList,
       filter: {
         section: '',
