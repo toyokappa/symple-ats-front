@@ -11,8 +11,19 @@
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 選考状態
         .col-start-2.col-span-5
-          .px-2.py-1
-            .inline-block.text-xs.rounded.bg-gray-100.px-2(:class="'py-0.5'") {{ currentColumn.name }}
+          v-select.text-sm.text-gray-300(
+            v-model="currentCard.recruitmentSelectionId"
+            placeholder="未入力"
+            :options="kanban"
+            label="name"
+            :reduce="selection => selection.id"
+            :class="'v-select-custom-style'"
+            @input="update('recruitmentSelectionId')"
+          )
+            template(#selected-option="option")
+              .inline-block.text-xs.rounded.bg-gray-100.px-2(:class="'py-0.5'") {{ option.name }}
+            template(v-slot:option="option")
+              .inline-block.text-xs.rounded.bg-gray-100.px-2(:class="'py-0.5'") {{ option.name }}
       .grid.grid-cols-6.mb-2.items-center
         .text-sm 担当者
         .col-start-2.col-span-5
@@ -147,6 +158,7 @@ export default {
       )
       let candidate = {}
       candidate[fieldSnakeCase] = this.currentCard[field]
+      console.log(candidate)
       this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
     },
     updateAssociation(association) {
