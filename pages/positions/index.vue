@@ -20,7 +20,7 @@
           parts-table-head-column 公開状態
       tbody.text-sm
         tr.cursor-pointer(
-          v-for="position in searchedPositionList"
+          v-for="position in positionList"
           :key="position.id"
           :class="'hover:bg-gray-100'"
           @click="openEditModal(position)"
@@ -30,7 +30,7 @@
           parts-table-body-column
             parts-text-with-empty-state(:attribute="position.externalName")
           parts-table-body-column
-            | {{ statusJa(position.status) }}
+            | {{ position.statusJa }}
 
     //- 作成UI
     parts-modal(ref="addPositionModal")
@@ -87,14 +87,12 @@
 </template>
 
 <script>
-import { statusList } from '@/fixtures/positionList'
+import Position, { statusList } from '../../models/Position'
 
 export default {
-  async asyncData({ $axios }) {
-    const { data } = await $axios.get('/positions')
-    return {
-      positionList: data,
-    }
+  async fetch({ $axios }) {
+    const { data: positionList } = await $axios.get('/positions')
+    await Position.insertOrUpdate({ data: positionList })
   },
   data() {
     return {
@@ -137,15 +135,13 @@ export default {
           return data
         })
       )
-
-      // 画面描画
-      this.positionList = this.positionList.concat(newPositionList)
+      Position.insert({ data: newPositionList })
 
       // 初期化
       this.addPositionList = [{ internalName: '', externalName: '' }]
       this.$refs.addPositionModal.closeModal()
     },
-    update(field) {
+    async update(field) {
       // 更新したフィールドのみ更新を走らせる
       const fieldSnakeCase = field.replace(
         /[A-Z]/g,
@@ -153,7 +149,12 @@ export default {
       )
       let position = {}
       position[fieldSnakeCase] = this.currentPosition[field]
-      this.$axios.put(`/positions/${this.currentPosition.id}`, { position })
+
+      const { data } = await this.$axios.put(
+        `/positions/${this.currentPosition.id}`,
+        { position }
+      )
+      Position.update({ data })
     },
     openEditModal(position) {
       this.currentPosition = position
@@ -162,19 +163,18 @@ export default {
         this.$refs.nameField.focus()
       })
     },
-    statusJa(statusEn) {
-      return this.statusList.find((status) => status.en === statusEn).ja
-    },
   },
   computed: {
-    searchedPositionList() {
-      return this.positionList.filter((position) => {
-        return (
-          (position.internalName.indexOf(this.searchKeyword) !== -1 ||
-            position.externalName.indexOf(this.searchKeyword) !== -1) &&
-          position.status.indexOf(this.searchStatus) !== -1
-        )
-      })
+    positionList() {
+      return Position.query()
+        .where((position) => {
+          return (
+            (position.internalName.indexOf(this.searchKeyword) !== -1 ||
+              position.externalName.indexOf(this.searchKeyword) !== -1) &&
+            position.status.indexOf(this.searchStatus) !== -1
+          )
+        })
+        .get()
     },
   },
 }

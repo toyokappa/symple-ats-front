@@ -6,10 +6,19 @@ export default class Position extends Model {
 
   static fields() {
     return {
-      id: this.number(null),
+      id: this.attr(null),
       internalName: this.string(''),
       externalName: this.string(''),
       status: this.string(''),
     }
   }
+
+  get statusJa() {
+    return statusList.find((locale) => locale.en === this.status).ja
+  }
 }
+
+export const statusList = [
+  { en: 'open', ja: '公開中' },
+  { en: 'close', ja: '非公開' },
+]
