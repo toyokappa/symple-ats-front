@@ -5,13 +5,13 @@
 
     //- 検索UI（一旦後回し）
     .flex.justify-end.mb-2
-      input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="keyword")
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="role" :class="dummyPlaceholder(role)")
-        option(:value="null" selected) 権限で絞り込む
-        option(v-for="r in roles" :value="r.value" :key="r.value") {{ r.name }}
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="level" :class="dummyPlaceholder(level)")
+      input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="searchKeyword")
+      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchRole" :class="dummyPlaceholder(searchRole)")
+        option(value="" selected) 権限で絞り込む
+        option(v-for="role in roleList" :value="role.en" :key="role.en") {{ role.ja }}
+      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchLevel" :class="dummyPlaceholder(searchLevel)")
         option(:value="null" selected) 利用練度で絞り込む
-        option(v-for="lv in levels" :value="lv" :key="lv") Lv. {{ lv }}
+        option(v-for="level in levelList" :value="level" :key="level") Lv. {{ level }}
       button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.invitationModal.openModal()") リクルーターを招待する
 
     //- 一覧UI
@@ -33,7 +33,7 @@
             parts-recruiter(v-if="recruiter.nickname" :recruiter="recruiter")
             .text-sm.text-gray-400(v-else) 招待中...
           parts-table-body-column {{ recruiter.email }}
-          parts-table-body-column {{ recruiter.role }}
+          parts-table-body-column {{ recruiter.roleJa }}
           parts-table-body-column Lv. {{ recruiter.level }}
 
     //- 招待UI（一旦後回し）
@@ -50,7 +50,7 @@
           :class="dummyPlaceholder(invitation.role)"
         )
           option(:value="null" selected style="display: none") 付与する権限
-          option(v-for="r in roles" :value="r.value" :key="r.value") {{ r.name }}
+          option(v-for="role in roleList" :value="role.en" :key="role.en") {{ role.ja }}
         .text-sm.text-gray-300.border.border-gray-200.rounded.px-2.py-1.cursor-pointer(
           @click="removeInvitation(index)"
         ) ×
@@ -67,7 +67,7 @@
       template(v-if="currentRecruiter")
         input.text-3xl.font-bold.outline-none.placeholder-gray-300.mb-5(
           type="text"
-          v-model="currentRecruiter.name"
+          v-model="currentRecruiter.nickname"
           placeholder="名前未入力"
           ref="nameField"
         )
@@ -81,21 +81,22 @@
             v-select.text-sm.text-gray-300(
               v-model="currentRecruiter.role"
               placeholder="未入力"
-              :options="roles"
-              :reduce="role => role.value"
+              :options="roleList"
+              label="ja"
+              :reduce="role => role.en"
               :class="'v-select-custom-style'"
             )
               template(#selected-option="option")
-                .text-sm {{ option.label }}
+                .text-sm {{ option.ja }}
               template(v-slot:option="option")
-                .text-sm {{ option.label }}
+                .text-sm {{ option.ja }}
         .grid.grid-cols-6.mb-2.items-center
           .text-sm 利用練度
           .col-start-2.col-span-5
             v-select.text-sm.text-gray-300(
               v-model="currentRecruiter.level"
               placeholder="未入力"
-              :options="levels"
+              :options="levelList"
               :class="'v-select-custom-style'"
             )
               template(#selected-option="option")
@@ -105,26 +106,24 @@
 </template>
 
 <script>
-import { roles, levels } from '@/fixtures/recruiterList'
+import Recruiter, { roleList, levelList } from '../../models/Recruiter'
 
 export default {
-  async asyncData({ $axios }) {
-    const { data } = await $axios.get('/recruiters')
-    return {
-      recruiterList: data,
-    }
+  async fetch({ $axios }) {
+    const { data: recruiterList } = await $axios.get('/recruiters')
+    Recruiter.insertOrUpdate({ data: recruiterList })
   },
   data() {
     return {
-      roles,
-      levels,
-      keyword: '',
-      role: null,
-      level: null,
+      roleList,
+      levelList,
+      searchKeyword: '',
+      searchRole: '',
+      searchLevel: null,
       invitationList: [
         {
           email: '',
-          role: null,
+          role: '',
         },
       ],
       currentRecruiter: null,
@@ -152,7 +151,7 @@ export default {
       })
       // TODO: メールを飛ばすロジックを追加する
       this.recruiterList = this.recruiterList.concat(newRecruiters)
-      this.invitationList = [{ email: '', role: null }]
+      this.invitationList = [{ email: '', role: '' }]
       this.$refs.invitationModal.closeModal()
     },
     openEditModal(recruiter) {
@@ -161,6 +160,18 @@ export default {
       this.$nextTick(() => {
         this.$refs.nameField.focus()
       })
+    },
+  },
+  computed: {
+    recruiterList() {
+      return Recruiter.query()
+        .where((recruiter) => {
+          return (
+            recruiter.nickname.indexOf(this.searchKeyword) !== -1 &&
+            recruiter.role.indexOf(this.searchRole) !== -1
+          )
+        })
+        .get()
     },
   },
 }
