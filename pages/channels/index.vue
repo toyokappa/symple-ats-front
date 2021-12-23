@@ -9,7 +9,7 @@
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchCategory" :class="dummyPlaceholder(searchCategory)")
         option(value="" selected) チャネル種別で絞り込む
         option(v-for="cat in categoryList" :value="cat.en" :key="cat.en") {{ cat.ja }}
-      button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.addChannelsModal.openModal()") チャネルを追加する
+      button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.addChannelModal.openModal()") チャネルを追加する
 
     //- 一覧UI
     table.w-full
@@ -21,7 +21,7 @@
           parts-table-head-column 応募URL
       tbody.text-sm
         tr.cursor-pointer(
-          v-for="channel in searchedChannels"
+          v-for="channel in channelList"
           :key="channel.id"
           :class="'hover:bg-gray-100'"
           @click="openEditModal(channel)"
@@ -30,18 +30,18 @@
             parts-text-with-empty-state(:attribute="channel.name")
           parts-table-body-column
             .inline-block.text-xs.text-black.rounded.px-2(
-              :class="`bg-${category(channel.category).color}-100 py-0.5`"
-            ) {{ category(channel.category).ja }}
+              :class="`bg-${channel.categoryColor}-100 py-0.5`"
+            ) {{ channel.categoryJa }}
           parts-table-body-column
-            | {{ automationJa(channel.automation) }}
+            | {{ channel.automationJa }}
           parts-table-body-column
-            template(v-if="channel.applyToken") https://symple.com{{ channel.applyToken }}
+            template(v-if="channel.applyToken !== ''") https://symple.com/{{ channel.applyToken }}
             template(v-else) -
 
     //- 作成UI
-    parts-modal(ref="addChannelsModal")
+    parts-modal(ref="addChannelModal")
       .text-3xl.font-bold.mb-5 チャネル追加
-      .flex.mb-2(v-for="(addChannel, index) in addChannels" :key="index")
+      .flex.mb-2(v-for="(addChannel, index) in addChannelList" :key="index")
         input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
           type="text"
           v-model="addChannel.name"
@@ -88,9 +88,13 @@
 </template>
 
 <script>
-import { categoryList, automationList } from '@/fixtures/channelList'
+import Channel, { categoryList, automationList } from '../../models/Channel'
 
 export default {
+  async fetch({ $axios }) {
+    const { data: channelList } = await $axios.get('/channels')
+    Channel.insertOrUpdate({ data: channelList })
+  },
   async asyncData({ $axios }) {
     const { data } = await $axios.get('/channels')
     return {
@@ -103,7 +107,7 @@ export default {
       automationList,
       searchKeyword: '',
       searchCategory: '',
-      addChannels: [
+      addChannelList: [
         {
           name: '',
           category: '',
@@ -118,18 +122,18 @@ export default {
     },
     add() {
       const newChannel = { name: '', category: '' }
-      this.addChannels = [...this.addChannels, newChannel]
+      this.addChannelList = [...this.addChannelList, newChannel]
     },
     remove(index) {
-      this.addChannels.splice(index, 1)
+      this.addChannelList.splice(index, 1)
     },
     async create() {
-      if (this.addChannels.length === 0) return
+      if (this.addChannelList.length === 0) return
       // TODO: バリデーションロジックは追加する
 
       // データ通信
-      const newChannels = await Promise.all(
-        this.addChannels.map(async (channel) => {
+      const newChannelList = await Promise.all(
+        this.addChannelList.map(async (channel) => {
           const { data } = await this.$axios.post('/channels', {
             channel: {
               name: channel.name,
@@ -140,14 +144,13 @@ export default {
         })
       )
 
-      // 画面描画
-      this.channels = this.channels.concat(newChannels)
+      Channel.insert({ data: newChannelList })
 
       // 初期化
-      this.addChannels = [{ name: '', category: '' }]
-      this.$refs.addChannelsModal.closeModal()
+      this.addChannelList = [{ name: '', category: '' }]
+      this.$refs.addChannelModal.closeModal()
     },
-    update(field) {
+    async update(field) {
       // 更新したフィールドのみ更新を走らせる
       const fieldSnakeCase = field.replace(
         /[A-Z]/g,
@@ -155,30 +158,30 @@ export default {
       )
       let channel = {}
       channel[fieldSnakeCase] = this.currentChannel[field]
-      this.$axios.put(`/channels/${this.currentChannel.id}`, { channel })
+      const { data } = await this.$axios.put(
+        `/channels/${this.currentChannel.id}`,
+        { channel }
+      )
+      Channel.update({ data })
     },
-    openEditModal(channels) {
-      this.currentChannel = channels
+    openEditModal(channel) {
+      this.currentChannel = channel
       this.$refs.channelsEditModal.openModal()
       this.$nextTick(() => {
         this.$refs.nameField.focus()
       })
     },
-    category(categoryEn) {
-      return this.categoryList.find((category) => category.en === categoryEn)
-    },
-    automationJa(en) {
-      return this.automationList.find((item) => item.en === en).ja
-    },
   },
   computed: {
-    searchedChannels() {
-      return this.channels.filter((channel) => {
-        return (
-          channel.name.indexOf(this.searchKeyword) !== -1 &&
-          channel.category.indexOf(this.searchCategory) !== -1
-        )
-      })
+    channelList() {
+      return Channel.query()
+        .where((channel) => {
+          return (
+            channel.name.indexOf(this.searchKeyword) !== -1 &&
+            channel.category.indexOf(this.searchCategory) !== -1
+          )
+        })
+        .get()
     },
   },
 }
