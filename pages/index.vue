@@ -150,7 +150,7 @@ export default {
         this.$refs.nameField.focus()
       })
     },
-    update(field) {
+    async update(field) {
       // 更新したフィールドのみ更新を走らせる
       const fieldSnakeCase = field.replace(
         /[A-Z]/g,
@@ -158,10 +158,13 @@ export default {
       )
       let candidate = {}
       candidate[fieldSnakeCase] = this.currentCard[field]
-      console.log(candidate)
-      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+      const { data: kanban } = await this.$axios.put(
+        `/candidates/${this.currentCard.id}`,
+        { candidate }
+      )
+      this.kanban = kanban
     },
-    updateAssociation(association) {
+    async updateAssociation(association) {
       // 更新したフィールドのみ更新を走らせる
       const acSnakeCase = association.replace(
         /[A-Z]/g,
@@ -169,7 +172,11 @@ export default {
       )
       let candidate = {}
       candidate[`${acSnakeCase}_id`] = this.currentCard[association].id
-      this.$axios.put(`/candidates/${this.currentCard.id}`, { candidate })
+      const { data: kanban } = await this.$axios.put(
+        `/candidates/${this.currentCard.id}`,
+        { candidate }
+      )
+      this.kanban = kanban
     },
     updateHistory(currentHistory, field) {
       // 更新したフィールドのみ更新を走らせる
