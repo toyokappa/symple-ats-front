@@ -36,6 +36,7 @@ draggable(
 </template>
 
 <script>
+import Candidate from '../../../models/Candidate'
 export default {
   props: {
     kanban: {
@@ -75,7 +76,7 @@ export default {
         },
       })
 
-      column.candidates.push(data)
+      Candidate.insert({ data })
       this.createColumnId = null
       this.nameField = ''
     },
