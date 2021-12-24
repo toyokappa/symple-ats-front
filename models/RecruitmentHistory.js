@@ -1,4 +1,5 @@
 import { Model } from '@vuex-orm/core'
+import RecruitmentSelection from './RecruitmentSelection'
 
 export default class RecruitmentHistory extends Model {
   static entity = 'recruitmentHistories'
@@ -8,9 +9,18 @@ export default class RecruitmentHistory extends Model {
     return {
       id: this.number(null),
       selectedAt: this.attr(null),
-      result: this.string(''),
+      result: this.attr(null),
       recruitmentSelectionId: this.number(null),
       candidateId: this.number(null),
+      recruitmentSelection: this.belongsTo(
+        RecruitmentSelection,
+        'recruitmentSelectionId'
+      ),
     }
   }
 }
+
+export const resultList = [
+  { en: 'pass', ja: '合格' },
+  { en: 'failure', ja: '不合格' },
+]

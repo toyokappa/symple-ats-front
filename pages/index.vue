@@ -1,6 +1,6 @@
 <template lang="pug"> 
 .p-5
-  parts-kanban-column(:kanban="kanban" :openModal="openModal")
+  parts-kanban-column(:kanban="selectionList" :openModal="openModal")
   parts-modal(ref="kanbanModal")
     template(v-if="currentCard")
       parts-form-title-like-text-field(
@@ -14,7 +14,7 @@
           v-select.text-sm.text-gray-300(
             v-model="currentCard.recruitmentSelectionId"
             placeholder="未入力"
-            :options="kanban"
+            :options="selectionList"
             label="name"
             :reduce="selection => selection.id"
             :class="'v-select-custom-style'"
@@ -45,7 +45,7 @@
           v-select.text-sm.text-gray-300(
             v-model="currentCard.channel"
             placeholder="未入力"
-            :options="channels"
+            :options="channelList"
             label="name"
             :class="'v-select-custom-style'"
             @input="updateAssociation('channel')"
@@ -73,21 +73,23 @@
       //- 選考履歴
       .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="history in currentCard.recruitmentHistories" :key="history.id")
         .bg-gray-100.px-3.py-2.flex.justify-content-start.items-center
-          h3.text-sm.mr-5 {{ findColumn(history.recruitmentSelectionId).name }}
+          h3.text-sm.mr-5 {{ history.recruitmentSelection.name }}
           .text-sm.text-gray-500(
-            v-if="['document', 'interview'].includes(findColumn(history.recruitmentSelectionId).selectionType)"
+            v-if="['document', 'interview'].includes(history.recruitmentSelection.selectionType)"
           )
             v-select.text-sm.text-gray-500.w-32(
               v-model="history.result"
               placeholder="未選考"
-              :options="[{ label: '合格', value: 'pass'}, { label: '不合格', value: 'failure' }]"
-              :reduce="option => option.value"
-              label="label"
+              :options="resultList"
+              label="ja"
+              :reduce="result => result.en"
               :class="'v-select-custom-style-bg-gray'"
               @input="updateHistory(history, 'result')"
             )
               template(#selected-option="option")
-                .text-gray-500 {{ option.label }}
+                .text-gray-500 {{ option.ja }}
+              template(v-slot:option="option")
+                .text-gray-500 {{ option.ja }}
           .text-sm.text-gray-500.ml-auto
             v-date-picker(
               v-model="history.selectedAt"
@@ -123,23 +125,36 @@
 </template>
 
 <script>
+import Candidate from '../models/Candidate'
+import Channel from '../models/Channel'
+import Position from '../models/Position'
+import Recruiter from '../models/Recruiter'
+import RecruitmentHistory, { resultList } from '../models/RecruitmentHistory'
+import RecruitmentSelection from '../models/RecruitmentSelection'
+
 export default {
+  async fetch({ $axios }) {
+    const { data: selectionList } = await $axios.get('/recruitment_selections')
+    const { data: recruiterList } = await $axios.get('/recruiters')
+    const { data: channelList } = await $axios.get('/channels')
+    const { data: positionList } = await $axios.get('/positions')
+
+    RecruitmentSelection.insertOrUpdate({ data: selectionList })
+    Recruiter.insertOrUpdate({ data: recruiterList })
+    Channel.insertOrUpdate({ data: channelList })
+    Position.insertOrUpdate({ data: positionList })
+  },
   async asyncData({ $axios }) {
     const { data: kanban } = await $axios.get('/recruitment_selections')
-    const { data: recruiterList } = await $axios.get('/recruiters')
-    const { data: channels } = await $axios.get('/channels')
-    const { data: positionList } = await $axios.get('/positions')
 
     return {
       kanban,
-      recruiterList,
-      channels,
-      positionList,
     }
   },
   data() {
     return {
       currentCard: null,
+      resultList,
     }
   },
   methods: {
@@ -158,11 +173,11 @@ export default {
       )
       let candidate = {}
       candidate[fieldSnakeCase] = this.currentCard[field]
-      const { data: kanban } = await this.$axios.put(
+      const { data } = await this.$axios.put(
         `/candidates/${this.currentCard.id}`,
         { candidate }
       )
-      this.kanban = kanban
+      Candidate.update({ data })
     },
     async updateAssociation(association) {
       // 更新したフィールドのみ更新を走らせる
@@ -172,13 +187,13 @@ export default {
       )
       let candidate = {}
       candidate[`${acSnakeCase}_id`] = this.currentCard[association].id
-      const { data: kanban } = await this.$axios.put(
+      const { data } = await this.$axios.put(
         `/candidates/${this.currentCard.id}`,
         { candidate }
       )
-      this.kanban = kanban
+      Candidate.update({ data })
     },
-    updateHistory(currentHistory, field) {
+    async updateHistory(currentHistory, field) {
       // 更新したフィールドのみ更新を走らせる
       const fieldSnakeCase = field.replace(
         /[A-Z]/g,
@@ -186,19 +201,25 @@ export default {
       )
       let history = {}
       history[fieldSnakeCase] = currentHistory[field]
-      this.$axios.put(`/recruitment_histories/${currentHistory.id}`, {
-        history,
-      })
-    },
-    findColumn(columnId) {
-      return this.kanban.find((column) => column.id == columnId)
+      const { data } = await this.$axios.put(
+        `/recruitment_histories/${currentHistory.id}`,
+        { history }
+      )
+      RecruitmentHistory.update({ data })
     },
   },
   computed: {
-    currentColumn() {
-      return this.kanban.find(
-        (column) => column.id === this.currentCard.recruitmentSelectionId
-      )
+    selectionList() {
+      return RecruitmentSelection.query().withAllRecursive().all()
+    },
+    recruiterList() {
+      return Recruiter.all()
+    },
+    channelList() {
+      return Channel.all()
+    },
+    positionList() {
+      return Position.all()
     },
   },
 }
