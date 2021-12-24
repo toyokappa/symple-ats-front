@@ -23,6 +23,7 @@ draggable(
 </template>
 
 <script>
+import Candidate from '../../../models/Candidate'
 export default {
   props: {
     cardList: {
@@ -44,18 +45,31 @@ export default {
     }
   },
   methods: {
-    sort({ added, moved, removed }) {
+    async sort({ added, moved, removed }) {
       if (removed) return
 
       const { element, newIndex } = added || moved
-      this.$axios.put(`/candidates/${element.id}/position`, {
-        candidate: {
-          recruitment_selection_id: this.columnId,
-          list_position: newIndex + 1,
+
+      // 描画のために暫定的に1回アップデートを掛ける
+      Candidate.update({
+        where: element.id,
+        data: {
+          recruitmentSelectionId: this.columnId,
+          listPosition: newIndex + 1,
         },
       })
-      const card = this.cardList.find((card) => card.id === element.id)
-      card.recruitmentSelectionId = this.columnId
+      const { data } = await this.$axios.put(
+        `/candidates/${element.id}/position`,
+        {
+          candidate: {
+            recruitment_selection_id: this.columnId,
+            list_position: newIndex + 1,
+          },
+        }
+      )
+
+      // 採用履歴が増える可能性もあるのでAPIからのデータを注入
+      Candidate.insertOrUpdate({ data })
     },
   },
 }
