@@ -144,13 +144,6 @@ export default {
     Channel.insertOrUpdate({ data: channelList })
     Position.insertOrUpdate({ data: positionList })
   },
-  async asyncData({ $axios }) {
-    const { data: kanban } = await $axios.get('/recruitment_selections')
-
-    return {
-      kanban,
-    }
-  },
   data() {
     return {
       currentCard: null,
