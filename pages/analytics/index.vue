@@ -7,7 +7,7 @@
         option(v-for="channels in channelsSelection" :value="channels" :key="channels") {{ channels }}
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.position" :class="dummyPlaceholder(filter.position)")
         option(value="" selected) ポジションで絞り込む
-        option(v-for="position in positionList" :value="position.name" :key="position.id") {{ position.name }}
+        option(v-for="position in positionList" :value="position.id" :key="position.id") {{ position.internalName }}
     .relative.mb-3
       .absolute.flex.w-full
         .flex-1.p-3(v-for="(value, index) in displayValues" :key="index")
@@ -40,18 +40,17 @@
 </template>
 
 <script>
-import { positionList } from '@/fixtures'
-
 export default {
   async asyncData({ $axios }) {
     const { data: analytics } = await $axios.get('/analytics')
+    const { data: positionList } = await $axios.get('/positions')
     return {
       analytics,
+      positionList,
     }
   },
   data() {
     return {
-      positionList,
       filter: {
         section: '',
         position: '',
