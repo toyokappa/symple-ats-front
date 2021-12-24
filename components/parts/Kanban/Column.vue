@@ -9,11 +9,11 @@ draggable(
   item-key="id"
 )
   transition-group(class="inline-flex" type="transition" :name="!drag ? 'flip-list' : null")
-    .bg-white.w-72.rounded.border.border-gray-200.mx-2(v-for="column in kanban" :key="column.id")
-      .bg-gray-100.px-3.py-2.flex.justify-content-start.cursor-pointer
+    .bg-white.w-72.h-full.rounded.border.border-gray-200.mx-2(v-for="column in kanban" :key="column.id")
+      .bg-gray-100.px-3.py-2.flex.justify-content-start.cursor-pointer.overflow-y-clip
         h3.text-sm.mr-2 {{ column.name }}
         .text-sm.text-gray-500 {{ column.candidates.length }}
-      .bg-white.p-3
+      .kanban-column.bg-white.p-3.overflow-y-scroll
         parts-kanban-card(
           :cardList="column.candidates"
           :columnId="column.id"
@@ -87,4 +87,6 @@ export default {
 <style lang="sass" scoped>
 .ghost
   opacity: 0.5
+.kanban-column
+  max-height: calc(100vh - 36px - 2.5rem)
 </style>
