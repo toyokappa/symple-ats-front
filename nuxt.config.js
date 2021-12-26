@@ -27,6 +27,7 @@ export default {
     '@/plugins/axios',
     '@/plugins/calendar',
     '@/plugins/chart',
+    '@/plugins/clickOutside',
     '@/plugins/draggable',
     '@/plugins/select',
   ],
@@ -59,7 +60,7 @@ export default {
       local: {
         endpoints: {
           login: { url: '/auth/sign_in' },
-          logout: false,
+          logout: { url: 'auth/sign_out', method: 'delete' },
           user: false,
         },
       },
