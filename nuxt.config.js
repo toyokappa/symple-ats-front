@@ -59,9 +59,9 @@ export default {
     strategies: {
       local: {
         endpoints: {
-          login: { url: '/auth/sign_in' },
+          login: { url: '/auth/sign_in', propertyName: false },
           logout: { url: 'auth/sign_out', method: 'delete' },
-          user: false,
+          user: { url: '/auth/recruiter', propertyName: '' },
         },
       },
     },
