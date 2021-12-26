@@ -24,6 +24,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '@/plugins/axios',
     '@/plugins/calendar',
     '@/plugins/chart',
     '@/plugins/draggable',
@@ -41,10 +42,32 @@ export default {
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ['@nuxtjs/axios'],
+  modules: ['@nuxtjs/auth', '@nuxtjs/axios'],
 
   axios: {
     baseURL: 'http://localhost:7700',
+  },
+
+  auth: {
+    redirect: {
+      login: '/signin',
+      logout: '/signin',
+      callback: false,
+      home: '/',
+    },
+    strategies: {
+      local: {
+        endpoints: {
+          login: { url: '/auth/sign_in' },
+          logout: false,
+          user: false,
+        },
+      },
+    },
+  },
+
+  router: {
+    middleware: ['auth'],
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
