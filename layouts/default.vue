@@ -19,11 +19,13 @@ div
         .relative(
           v-click-outside="closeDropdown"
         )
-          button.flex.flex-row.items-center.w-full.text-sm.font-semibold.text-left(
+          button.flex.flex-row.w-full.text-sm.text-left(
             @click="open = !open"
           )
-            span {{ $auth.user.nickname }}
-            svg.inline.w-4.h-4.ml-1.transition-transform.dration-200.transform(
+            div(v-if="$auth.user")
+              .font-semibold {{ $auth.user.organization.name }}
+              .text-gray-500 {{ $auth.user.nickname }}
+            svg.inline.w-4.h-4.mt-1.ml-1.transition-transform.dration-200.transform(
               fill="currentColor"
               viewBox="0 0 20 20"
               :class="{'rotate-0': open, 'rotate-180': !open}"
@@ -34,7 +36,7 @@ div
                 clip-rule="evenodd"
               )
         transition(name="fade")
-          .absolute.left-4.bottom-12.w-full.mb-1.origin-top-right.rounded.shadow(
+          .absolute.left-4.bottom-16.w-full.mb-2.origin-top-right.rounded.shadow(
             v-if="open"
           )
             .px-3.py-2.bg-white.rounded.shadow
