@@ -92,15 +92,10 @@ import Channel, { categoryList, automationList } from '@/models/Channel'
 
 export default {
   layout: 'signedIn',
-  async fetch({ $axios }) {
-    const { data: channelList } = await $axios.get('/channels')
+  async fetch({ $axios, $auth }) {
+    const orgId = $auth.user.organization.uniqueId
+    const { data: channelList } = await $axios.get(`/${orgId}/channels`)
     Channel.insertOrUpdate({ data: channelList })
-  },
-  async asyncData({ $axios }) {
-    const { data } = await $axios.get('/channels')
-    return {
-      channels: data,
-    }
   },
   data() {
     return {

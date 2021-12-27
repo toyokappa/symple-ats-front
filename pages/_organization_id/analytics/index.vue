@@ -42,9 +42,10 @@
 <script>
 export default {
   layout: 'signedIn',
-  async asyncData({ $axios }) {
-    const { data: analytics } = await $axios.get('/analytics')
-    const { data: positionList } = await $axios.get('/positions')
+  async asyncData({ $axios, $auth }) {
+    const orgId = $auth.user.organization.uniqueId
+    const { data: analytics } = await $axios.get(`/${orgId}/analytics`)
+    const { data: positionList } = await $axios.get(`/${orgId}/positions`)
     return {
       analytics,
       positionList,

@@ -91,8 +91,9 @@ import Position, { statusList } from '@/models/Position'
 
 export default {
   layout: 'signedIn',
-  async fetch({ $axios }) {
-    const { data: positionList } = await $axios.get('/positions')
+  async fetch({ $axios, $auth }) {
+    const orgId = $auth.user.organization.uniqueId
+    const { data: positionList } = await $axios.get(`/${orgId}/positions`)
     await Position.insertOrUpdate({ data: positionList })
   },
   data() {

@@ -134,11 +134,14 @@ import RecruitmentSelection from '@/models/RecruitmentSelection'
 
 export default {
   layout: 'signedIn',
-  async fetch({ $axios }) {
-    const { data: selectionList } = await $axios.get('/recruitment_selections')
-    const { data: recruiterList } = await $axios.get('/recruiters')
-    const { data: channelList } = await $axios.get('/channels')
-    const { data: positionList } = await $axios.get('/positions')
+  async fetch({ $axios, $auth }) {
+    const orgId = $auth.user.organization.uniqueId
+    const { data: selectionList } = await $axios.get(
+      `/${orgId}/recruitment_selections`
+    )
+    const { data: recruiterList } = await $axios.get(`/${orgId}/recruiters`)
+    const { data: channelList } = await $axios.get(`/${orgId}/channels`)
+    const { data: positionList } = await $axios.get(`/${orgId}/positions`)
 
     RecruitmentSelection.insertOrUpdate({ data: selectionList })
     Recruiter.insertOrUpdate({ data: recruiterList })

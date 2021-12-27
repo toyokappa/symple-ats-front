@@ -110,8 +110,9 @@ import Recruiter, { roleList, levelList } from '@/models/Recruiter'
 
 export default {
   layout: 'signedIn',
-  async fetch({ $axios }) {
-    const { data: recruiterList } = await $axios.get('/recruiters')
+  async fetch({ $axios, $auth }) {
+    const orgId = $auth.user.organization.uniqueId
+    const { data: recruiterList } = await $axios.get(`/${orgId}/recruiters`)
     Recruiter.insertOrUpdate({ data: recruiterList })
   },
   data() {

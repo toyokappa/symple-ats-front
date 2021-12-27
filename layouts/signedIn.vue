@@ -6,15 +6,15 @@ div
     )
       ul.px-5
         li.mb-3
-          n-link(:to="`/${organization_id}`") 採用進捗カンバン
+          n-link(:to="`/${orgId}`") 採用進捗カンバン
         li.mb-3
-          n-link(:to="`/${organization_id}/analytics`") 数値分析
+          n-link(:to="`/${orgId}/analytics`") 数値分析
         li.mb-3
-          n-link(:to="`/${organization_id}/recruiters`") リクルーター管理
+          n-link(:to="`/${orgId}/recruiters`") リクルーター管理
         li.mb-3
-          n-link(:to="`/${organization_id}/channels`") チャネル管理
+          n-link(:to="`/${orgId}/channels`") チャネル管理
         li.mb-3
-          n-link(:to="`/${organization_id}/positions`") ポジション管理
+          n-link(:to="`/${orgId}/positions`") ポジション管理
       .fixed.bottom-0.w-60.p-5.border-t.border-gray-300
         .relative(
           v-click-outside="closeDropdown"
@@ -69,7 +69,7 @@ export default {
     },
   },
   computed: {
-    organization_id() {
+    orgId() {
       return this.$route.params.organization_id
     },
   },
