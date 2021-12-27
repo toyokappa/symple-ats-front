@@ -23,6 +23,16 @@
           parts-table-head-column 権限
           parts-table-head-column 利用練度
       tbody.text-sm
+        tr(
+          v-for="invitation in invitationList"
+          :key="invitation.id"
+          :class="'hover:bg-gray-100'"
+        )
+          parts-table-body-column
+            .text-sm.text-gray-400() 招待中...
+          parts-table-body-column {{ invitation.email }}
+          parts-table-body-column {{ invitation.roleJa }}
+          parts-table-body-column -
         tr.cursor-pointer(
           v-for="recruiter in recruiterList"
           :key="recruiter.id"
@@ -31,7 +41,7 @@
         )
           parts-table-body-column
             parts-recruiter(v-if="recruiter.nickname" :recruiter="recruiter")
-            .text-sm.text-gray-400(v-else) 招待中...
+            .text-sm.text-gray-400(v-else) 未入力
           parts-table-body-column {{ recruiter.email }}
           parts-table-body-column {{ recruiter.roleJa }}
           parts-table-body-column Lv. {{ recruiter.level }}
@@ -107,11 +117,16 @@
 
 <script>
 import Recruiter, { roleList, levelList } from '@/models/Recruiter'
+import RecruiterInvitation from '@/models/RecruiterInvitation'
 
 export default {
   layout: 'signedIn',
   async fetch({ $axios, $auth }) {
     const orgId = $auth.user.organization.uniqueId
+    const { data: invitationList } = await $axios.get(
+      `/${orgId}/recruiter_invitations`
+    )
+    RecruiterInvitation.insertOrUpdate({ data: invitationList })
     const { data: recruiterList } = await $axios.get(`/${orgId}/recruiters`)
     Recruiter.insertOrUpdate({ data: recruiterList })
   },
@@ -122,7 +137,7 @@ export default {
       searchKeyword: '',
       searchRole: '',
       searchLevel: null,
-      invitationList: [
+      addInvitationList: [
         {
           email: '',
           role: '',
@@ -137,23 +152,23 @@ export default {
     },
     addInvitation() {
       const invitation = { email: '', role: '' }
-      this.invitationList = [...this.invitationList, invitation]
+      this.addInvitationList = [...this.addInvitationList, invitation]
     },
     removeInvitation(index) {
-      this.invitationList.splice(index, 1)
+      this.addInvitationList.splice(index, 1)
     },
     sendInvitation() {
-      if (this.invitationList.length === 0) return
+      if (this.addInvitationList.length === 0) return
       // TODO: バリデーションロジックは追加する
 
-      const newRecruiters = this.invitationList.map((invitation, index) => {
+      const newRecruiters = this.addInvitationList.map((invitation, index) => {
         invitation.id = this.recruiterList.length + index + 1
         invitation.level = 1
         return invitation
       })
       // TODO: メールを飛ばすロジックを追加する
       this.recruiterList = this.recruiterList.concat(newRecruiters)
-      this.invitationList = [{ email: '', role: '' }]
+      this.addInvitationList = [{ email: '', role: '' }]
       this.$refs.invitationModal.closeModal()
     },
     openEditModal(recruiter) {
@@ -165,11 +180,22 @@ export default {
     },
   },
   computed: {
+    invitationList() {
+      return RecruiterInvitation.query()
+        .where((invitation) => {
+          return (
+            invitation.email.indexOf(this.searchKeyword) !== -1 &&
+            invitation.role.indexOf(this.searchRole) !== -1
+          )
+        })
+        .get()
+    },
     recruiterList() {
       return Recruiter.query()
         .where((recruiter) => {
           return (
-            recruiter.nickname.indexOf(this.searchKeyword) !== -1 &&
+            (recruiter.nickname.indexOf(this.searchKeyword) !== -1 ||
+              recruiter.email.indexOf(this.searchKeyword) !== -1) &&
             recruiter.role.indexOf(this.searchRole) !== -1
           )
         })
