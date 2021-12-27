@@ -61,7 +61,7 @@ export default {
         endpoints: {
           login: { url: '/auth/sign_in', propertyName: false },
           logout: { url: 'auth/sign_out', method: 'delete' },
-          user: { url: '/auth/recruiter', propertyName: '' },
+          user: false,
         },
       },
     },

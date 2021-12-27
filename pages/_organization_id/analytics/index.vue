@@ -41,6 +41,7 @@
 
 <script>
 export default {
+  layout: 'signedIn',
   async asyncData({ $axios }) {
     const { data: analytics } = await $axios.get('/analytics')
     const { data: positionList } = await $axios.get('/positions')

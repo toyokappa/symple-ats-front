@@ -88,9 +88,10 @@
 </template>
 
 <script>
-import Channel, { categoryList, automationList } from '../../models/Channel'
+import Channel, { categoryList, automationList } from '@/models/Channel'
 
 export default {
+  layout: 'signedIn',
   async fetch({ $axios }) {
     const { data: channelList } = await $axios.get('/channels')
     Channel.insertOrUpdate({ data: channelList })

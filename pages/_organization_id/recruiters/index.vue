@@ -106,9 +106,10 @@
 </template>
 
 <script>
-import Recruiter, { roleList, levelList } from '../../models/Recruiter'
+import Recruiter, { roleList, levelList } from '@/models/Recruiter'
 
 export default {
+  layout: 'signedIn',
   async fetch({ $axios }) {
     const { data: recruiterList } = await $axios.get('/recruiters')
     Recruiter.insertOrUpdate({ data: recruiterList })

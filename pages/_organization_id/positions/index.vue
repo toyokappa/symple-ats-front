@@ -87,9 +87,10 @@
 </template>
 
 <script>
-import Position, { statusList } from '../../models/Position'
+import Position, { statusList } from '@/models/Position'
 
 export default {
+  layout: 'signedIn',
   async fetch({ $axios }) {
     const { data: positionList } = await $axios.get('/positions')
     await Position.insertOrUpdate({ data: positionList })
