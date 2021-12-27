@@ -39,9 +39,21 @@ div
           .absolute.left-4.bottom-16.w-full.mb-2.origin-top-right.rounded.shadow(
             v-if="open"
           )
-            .px-3.py-2.bg-white.rounded.shadow
-              a.block.py-2.text-xs(href="#") プロフィール編集
-              a.block.py-2.text-xs(@click.prevent="signout" href="#") ログアウト
+            .px-3.py-3.bg-white.rounded.shadow
+              .text-gray-500.text-xs.px-2.pt-2.pb-1(v-if="$auth.user.organizations.length > 1") 組織を選択
+              a.flex.items-center.justify-between.px-2.py-2.text-sm.font-bold.rounded(
+                v-for="org in $auth.user.organizations"
+                :href="`/${org.uniqueId}`"
+                :key="org.id"
+                :class="'hover:bg-gray-100'"
+              )
+                span {{ org.name }}
+                span(v-if="org.uniqueId === orgId")
+                  svg.w-4.h-4(xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24")
+                    path(d="M20.285 2l-11.285 11.567-5.286-5.011-3.714 3.716 9 8.728 15-15.285z")
+              .my-2.border-t.border-gray-300
+              a.block.px-2.py-2.text-xs.rounded(href="#" :class="'hover:bg-gray-100'") プロフィール編集
+              button.block.w-full.text-left.px-2.py-2.text-xs.rounded(@click.prevent="signout" :class="'hover:bg-gray-100'") ログアウト
     .flex-auto(
       :class="'lg:max-h-full lg:ml-60'"
     )
