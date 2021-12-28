@@ -3,6 +3,6 @@
 
 <script>
 export default {
-  middleware: ['checkSignedIn'],
+  middleware: ['redirectDefaultOrg'],
 }
 </script>
