@@ -25,7 +25,7 @@
       tbody.text-sm
         tr(
           v-for="invitation in invitationList"
-          :key="invitation.id"
+          :key="'invitation' + invitation.id"
           :class="'hover:bg-gray-100'"
         )
           parts-table-body-column
@@ -49,7 +49,7 @@
     //- 招待UI（一旦後回し）
     parts-modal(ref="invitationModal")
       .text-3xl.font-bold.mb-5 リクルーター招待
-      .flex.mb-2(v-for="(invitation, index) in invitationList" :key="index")
+      .flex.mb-2(v-for="(invitation, index) in addInvitationList" :key="index")
         input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
           type="email"
           v-model="invitation.email"
@@ -157,17 +157,26 @@ export default {
     removeInvitation(index) {
       this.addInvitationList.splice(index, 1)
     },
-    sendInvitation() {
+    async sendInvitation() {
       if (this.addInvitationList.length === 0) return
       // TODO: バリデーションロジックは追加する
 
-      const newRecruiters = this.addInvitationList.map((invitation, index) => {
-        invitation.id = this.recruiterList.length + index + 1
-        invitation.level = 1
-        return invitation
-      })
-      // TODO: メールを飛ばすロジックを追加する
-      this.recruiterList = this.recruiterList.concat(newRecruiters)
+      const newInvitationList = await Promise.all(
+        this.addInvitationList.map(async (invitation) => {
+          const { data } = await this.$axios.post(
+            `/${this.orgId}/recruiter_invitations`,
+            {
+              invitation: {
+                email: invitation.email,
+                role: invitation.role,
+              },
+            }
+          )
+          return data
+        })
+      )
+      RecruiterInvitation.insert({ data: newInvitationList })
+
       this.addInvitationList = [{ email: '', role: '' }]
       this.$refs.invitationModal.closeModal()
     },
@@ -180,6 +189,9 @@ export default {
     },
   },
   computed: {
+    orgId() {
+      return this.$auth.user.organization.uniqueId
+    },
     invitationList() {
       return RecruiterInvitation.query()
         .where((invitation) => {
