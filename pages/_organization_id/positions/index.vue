@@ -26,6 +26,7 @@
     v-btn(
       depressed
       height="40"
+      @click.stop="createDialog = true"
     ) ポジションを追加する
   //- .flex.justify-end.mb-2
   //-   input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="searchKeyword")
@@ -61,22 +62,68 @@
   //-         | {{ position.statusJa }}
 
   //- 作成UI
-  parts-modal(ref="addPositionModal")
-    .text-3xl.font-bold.mb-5 ポジション追加
-    .flex.mb-2(v-for="(addPosition, index) in addPositionList" :key="index")
-      input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
-        type="text"
-        v-model="addPosition.internalName"
-        placeholder="内部管理用のポジション名"
-      )
-      input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
-        type="text"
-        v-model="addPosition.externalName"
-        placeholder="外部効果用のポジション名"
-      )
-      parts-button-remove-field(@removeEvent="remove(index)")
-    parts-button-add-field(@addEvent="add()") + ポジションを更に追加する
-    parts-button-primary(@submitEvent="create()") ポジションの追加を確定する
+  v-dialog(
+    v-model="createDialog"
+    max-width="800"
+  )
+    v-card
+      v-container
+        v-card-title
+          h3 ポジション追加
+        v-card-text
+          v-row.mb-2(
+            v-for="(addPosition, index) in addPositionList"
+            :key="index"
+            align="center"
+            dense
+          )
+            v-col(cols="4")
+              v-text-field.body-2(
+                v-model="addPosition.internalName"
+                placeholder="内部管理名"
+                outlined
+                dense
+                hide-details="auto"
+              )
+            v-col(cols="8")
+              v-text-field.body-2(
+                v-model="addPosition.externalName"
+                placeholder="外部公開名"
+                outlined
+                dense
+                hide-details="auto"
+                append-outer-icon="mdi-delete"
+                @click:append-outer="remove"
+              )
+          .mb-3
+            .d-flex.align-center.justify-space-between
+              v-btn(
+                text
+                @click="add"
+              )
+                v-icon mdi-expand-all
+                .ms-1 ポジションを更に追加
+              v-btn(
+                depressed
+                @click="create"
+              )
+                span ポジションの追加を確定する
+  //- parts-modal(ref="addPositionModal")
+  //-   .text-3xl.font-bold.mb-5 ポジション追加
+  //-   .flex.mb-2(v-for="(addPosition, index) in addPositionList" :key="index")
+  //-     input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
+  //-       type="text"
+  //-       v-model="addPosition.internalName"
+  //-       placeholder="内部管理用のポジション名"
+  //-     )
+  //-     input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
+  //-       type="text"
+  //-       v-model="addPosition.externalName"
+  //-       placeholder="外部効果用のポジション名"
+  //-     )
+  //-     parts-button-remove-field(@removeEvent="remove(index)")
+  //-   parts-button-add-field(@addEvent="add()") + ポジションを更に追加する
+  //-   parts-button-primary(@submitEvent="create()") ポジションの追加を確定する
 
   //- 詳細/編集UI
   parts-modal(ref="positionEditModal")
@@ -134,6 +181,7 @@ export default {
       statusList,
       searchKeyword: '',
       searchStatus: '',
+      createDialog: false,
       addPositionList: [
         {
           internalName: '',
@@ -161,7 +209,7 @@ export default {
       // データ通信
       const newPositionList = await Promise.all(
         this.addPositionList.map(async (position) => {
-          const { data } = await this.$axios.post('/positions', {
+          const { data } = await this.$axios.post(`/${this.orgId}/positions`, {
             position: {
               internal_name: position.internalName,
               external_name: position.externalName,
@@ -174,7 +222,7 @@ export default {
 
       // 初期化
       this.addPositionList = [{ internalName: '', externalName: '' }]
-      this.$refs.addPositionModal.closeModal()
+      this.createDialog = false
     },
     async update(field) {
       // 更新したフィールドのみ更新を走らせる
@@ -186,7 +234,7 @@ export default {
       position[fieldSnakeCase] = this.currentPosition[field]
 
       const { data } = await this.$axios.put(
-        `/positions/${this.currentPosition.id}`,
+        `/${this.orgId}/positions/${this.currentPosition.id}`,
         { position }
       )
       Position.update({ data })
@@ -200,6 +248,9 @@ export default {
     },
   },
   computed: {
+    orgId() {
+      return this.$auth.user.organization.uniqueId
+    },
     positionList() {
       return Position.query()
         .where((position) => {
