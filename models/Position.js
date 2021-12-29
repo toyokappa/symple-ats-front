@@ -22,3 +22,9 @@ export const statusList = [
   { en: 'open', ja: '公開中' },
   { en: 'close', ja: '非公開' },
 ]
+
+// Validations
+
+export const internalNameRules = [(v) => !!v || '内部管理名は入力が必須です']
+
+export const externalNameRules = [(v) => !!v || '外部公開名は入力が必須です']

@@ -38,43 +38,11 @@
     :items="positionList"
     hide-default-footer
   )
-    template(v-slot:item.internalName="props")
-      v-edit-dialog(
-        @open="currentPosition = props.item"
-        @close="currentPosition = null"
-        @save="update('internalName')"
-      ) {{ props.item.internalName }}
-        template(v-slot:input)
-          v-text-field.body-2(
-            v-model="props.item.internalName"
-            placeholder="内部管理名"
-          )
-    template(v-slot:item.externalName="props")
-      v-edit-dialog(
-        @open="currentPosition = props.item"
-        @close="currentPosition = null"
-        @save="update('externalName')"
-      ) {{ props.item.externalName }}
-        template(v-slot:input)
-          v-text-field.body-2(
-            v-model="props.item.externalName"
-            placeholder="外部公開名"
-          )
-    template(v-slot:item.statusJa="props")
-      v-edit-dialog(
-        @open="currentPosition = props.item"
-        @close="currentPosition = null"
-        ref="editStatus"
-      ) {{ props.item.statusJa }}
-        template(v-slot:input)
-          v-autocomplete.body-2(
-            v-model="props.item.status"
-            :items="statusList"
-            item-text="ja"
-            item-value="en"
-            placeholder="公開状態"
-            @change="update('status')"
-          )
+    template(v-slot:item="{ item }")
+      tr.cursor-pointer(@click.stop="openUpdateDialog(item)")
+        td.text-start {{ item.internalName }}
+        td.text-start {{ item.externalName }}
+        td.text-start {{ item.statusJa }}
 
   //- 作成UI
   v-dialog(
@@ -86,47 +54,123 @@
         v-card-title
           h3 ポジション追加
         v-card-text
-          v-row.mb-2(
-            v-for="(addPosition, index) in addPositionList"
-            :key="index"
-            align="center"
-            dense
+          v-form(
+            v-model="valid.create"
+            lazy-validation
+            ref="createForm"
           )
-            v-col(cols="4")
-              v-text-field.body-2(
-                v-model="addPosition.internalName"
-                placeholder="内部管理名"
-                outlined
+            v-row(
+              v-for="(addPosition, index) in addPositionList"
+              :key="index"
+              align="center"
+              dense
+            )
+              v-col(cols="4")
+                v-text-field.body-2(
+                  v-model="addPosition.internalName"
+                  placeholder="内部管理名"
+                  :rules="internalNameRules"
+                )
+              v-col(cols="8")
+                v-text-field.body-2(
+                  v-model="addPosition.externalName"
+                  placeholder="外部公開名"
+                  :rules="externalNameRules"
+                  append-outer-icon="mdi-delete"
+                  @click:append-outer="remove"
+                )
+            .mb-3
+              .d-flex.align-center.justify-space-between
+                v-btn(
+                  text
+                  @click="add"
+                )
+                  v-icon mdi-expand-all
+                  .ms-1 ポジションを更に追加
+                v-btn(
+                  depressed
+                  @click="create"
+                )
+                  span ポジションの追加を確定する
+
+  //- 編集UI
+  template(v-if="currentPosition")
+    v-dialog(
+      v-model="updateDialog"
+      max-width="800"
+    )
+      v-card
+        v-container
+          v-card-text
+            v-form(
+              v-model="valid.internalName"
+              @submit.prevent
+            )
+              v-text-field.text-h5.font-weight-bold.mb-2(
+                v-model="currentPosition.internalName"
+                :rules="internalNameRules"
+                flat
+                solo
                 dense
+                placeholder="未入力"
                 hide-details="auto"
+                @blur="update('internalName')"
               )
-            v-col(cols="8")
-              v-text-field.body-2(
-                v-model="addPosition.externalName"
-                placeholder="外部公開名"
-                outlined
+            v-container
+              v-row(
                 dense
-                hide-details="auto"
-                append-outer-icon="mdi-delete"
-                @click:append-outer="remove"
               )
-          .mb-3
-            .d-flex.align-center.justify-space-between
-              v-btn(
-                text
-                @click="add"
+                v-col.py-1.grey--text(
+                  cols="2"
+                ) 外部公開名
+                v-col.py-0(
+                  cols="10"
+                )
+                  v-form.mb-1(
+                    v-model="valid.externalName"
+                    @submit.prevent
+                  )
+                    v-text-field.body-2(
+                      v-model="currentPosition.externalName"
+                      :rules="externalNameRules"
+                      dense
+                      :flat="flat.externalName"
+                      solo
+                      placeholder="未入力"
+                      hide-details="auto"
+                      @focus="flat.externalName = false"
+                      @blur="flattenAndUpdate('externalName')"
+                    )
+              v-row(
+                dense
               )
-                v-icon mdi-expand-all
-                .ms-1 ポジションを更に追加
-              v-btn(
-                depressed
-                @click="create"
-              )
-                span ポジションの追加を確定する
+                v-col.py-1.grey--text(
+                  cols="2"
+                ) 公開状態
+                v-col.py-0(
+                  cols="10"
+                )
+                  v-autocomplete.body-2(
+                    v-model="currentPosition.status"
+                    append-icon=""
+                    :items="statusList"
+                    item-text="ja"
+                    item-value="en"
+                    :flat="flat.status"
+                    solo
+                    dense
+                    hide-details="auto"
+                    @focus="flat.status = false"
+                    @blur="flattenAndUpdate('status')"
+                  )
 </template>
 
 <script>
-import Position, { statusList } from '@/models/Position'
+import Position, {
+  statusList,
+  internalNameRules,
+  externalNameRules,
+} from '@/models/Position'
 
 export default {
   layout: 'signedIn',
@@ -143,9 +187,19 @@ export default {
         { text: '公開状態', value: 'statusJa' },
       ],
       statusList,
+      internalNameRules,
+      externalNameRules,
+      valid: {
+        create: true,
+        internalName: true,
+        externalName: true,
+        status: true,
+      },
+      flat: { externalName: true, status: true },
       searchKeyword: '',
       searchStatus: '',
       createDialog: false,
+      updateDialog: false,
       addPositionList: [
         {
           internalName: '',
@@ -165,7 +219,9 @@ export default {
     },
     async create() {
       if (this.addPositionList.length === 0) return
-      // TODO: バリデーションロジックは追加する
+
+      await this.$refs.createForm.validate()
+      if (!this.valid.create) return
 
       // データ通信
       const newPositionList = await Promise.all(
@@ -186,6 +242,8 @@ export default {
       this.createDialog = false
     },
     async update(field) {
+      if (!this.valid[field]) return
+
       // 更新したフィールドのみ更新を走らせる
       const fieldSnakeCase = field.replace(
         /[A-Z]/g,
@@ -199,6 +257,14 @@ export default {
         { position }
       )
       Position.update({ data })
+    },
+    flattenAndUpdate(field) {
+      this.flat[field] = true
+      this.update(field)
+    },
+    openUpdateDialog(position) {
+      this.currentPosition = position
+      this.updateDialog = true
     },
   },
   computed: {
