@@ -3,28 +3,34 @@
   h2.mb-5 ポジション管理
 
   //- 検索UI
-  .d-flex.align-center.mb-2
-    v-text-field.body-2.me-3(
-      v-model="searchKeyword"
-      append-icon="mdi-magnify"
-      placeholder="キーワードで絞り込む"
-      dense
-      hide-details
+  v-row(no-gutters).mb-2
+    v-col(
+      offset-md="4"
+      md="8"
     )
-    v-autocomplete.body-2.me-3(
-      v-model="searchStatus"
-      :items="statusList"
-      item-text="ja"
-      item-value="en"
-      placeholder="公開状態で絞り込む"
-      dense
-      hide-details
-    )
-    v-btn(
-      depressed
-      height="40"
-      @click.stop="createDialog = true"
-    ) ポジションを追加する
+      .d-flex.align-center
+        v-text-field.body-2.me-3(
+          v-model="searchKeyword"
+          append-icon="mdi-magnify"
+          placeholder="キーワードで絞り込む"
+          dense
+          hide-details
+        )
+        v-autocomplete.body-2.me-3(
+          v-model="searchStatus"
+          :items="statusList"
+          item-text="ja"
+          item-value="en"
+          placeholder="公開状態で絞り込む"
+          dense
+          hide-details
+        )
+        v-btn(
+          small
+          depressed
+          height="32"
+          @click.stop="createDialog = true"
+        ) ポジションを追加する
 
   //- 一覧UI
   v-data-table(
