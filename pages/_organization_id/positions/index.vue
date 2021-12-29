@@ -41,6 +41,43 @@
     :items="positionList"
     hide-default-footer
   )
+    template(v-slot:item.internalName="props")
+      v-edit-dialog(
+        @open="currentPosition = props.item"
+        @close="currentPosition = null"
+        @save="update('internalName')"
+      ) {{ props.item.internalName }}
+        template(v-slot:input)
+          v-text-field.body-2(
+            v-model="props.item.internalName"
+            placeholder="内部管理名"
+          )
+    template(v-slot:item.externalName="props")
+      v-edit-dialog(
+        @open="currentPosition = props.item"
+        @close="currentPosition = null"
+        @save="update('externalName')"
+      ) {{ props.item.externalName }}
+        template(v-slot:input)
+          v-text-field.body-2(
+            v-model="props.item.externalName"
+            placeholder="外部公開名"
+          )
+    template(v-slot:item.statusJa="props")
+      v-edit-dialog(
+        @open="currentPosition = props.item"
+        @close="currentPosition = null"
+        ref="editStatus"
+      ) {{ props.item.statusJa }}
+        template(v-slot:input)
+          v-autocomplete.body-2(
+            v-model="props.item.status"
+            :items="statusList"
+            item-text="ja"
+            item-value="en"
+            placeholder="公開状態"
+            @change="update('status')"
+          )
   //- table.w-full
   //-   thead.text-sm.text-left.border-t.border-b.border-gray-200
   //-     tr
@@ -108,57 +145,41 @@
                 @click="create"
               )
                 span ポジションの追加を確定する
-  //- parts-modal(ref="addPositionModal")
-  //-   .text-3xl.font-bold.mb-5 ポジション追加
-  //-   .flex.mb-2(v-for="(addPosition, index) in addPositionList" :key="index")
-  //-     input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
-  //-       type="text"
-  //-       v-model="addPosition.internalName"
-  //-       placeholder="内部管理用のポジション名"
-  //-     )
-  //-     input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
-  //-       type="text"
-  //-       v-model="addPosition.externalName"
-  //-       placeholder="外部効果用のポジション名"
-  //-     )
-  //-     parts-button-remove-field(@removeEvent="remove(index)")
-  //-   parts-button-add-field(@addEvent="add()") + ポジションを更に追加する
-  //-   parts-button-primary(@submitEvent="create()") ポジションの追加を確定する
 
   //- 詳細/編集UI
-  parts-modal(ref="positionEditModal")
-    template(v-if="currentPosition")
-      parts-form-title-like-text-field(
-        v-model="currentPosition.internalName"
-        @updateEvent="update('internalName')"
-        ref="nameField"
-      )
-      .grid.grid-cols-9.mb-2.items-center
-        .col-span-2
-          .text-sm 外部公開用の名前
-        .col-start-3.col-span-7
-          parts-form-text-like-text-field(
-            v-model="currentPosition.externalName"
-            @updateEvent="update('externalName')"
-          )
-      .grid.grid-cols-9.mb-2.items-center
-        .col-span-2
-          .text-sm 公開状態
-        .col-start-3.col-span-7
-          v-select.text-sm.text-gray-300(
-            v-model="currentPosition.status"
-            placeholder="未入力"
-            :options="statusList"
-            :reduce="status => status.en"
-            label="ja"
-            :class="'v-select-custom-style'"
-            name="status"
-            @input="update('status')"
-          )
-            template(#selected-option="option")
-              .text-sm {{ option.ja }}
-            template(v-slot:option="option")
-              .text-sm {{ option.ja }}
+  //- parts-modal(ref="positionEditModal")
+  //-   template(v-if="currentPosition")
+  //-     parts-form-title-like-text-field(
+  //-       v-model="currentPosition.internalName"
+  //-       @updateEvent="update('internalName')"
+  //-       ref="nameField"
+  //-     )
+  //-     .grid.grid-cols-9.mb-2.items-center
+  //-       .col-span-2
+  //-         .text-sm 外部公開用の名前
+  //-       .col-start-3.col-span-7
+  //-         parts-form-text-like-text-field(
+  //-           v-model="currentPosition.externalName"
+  //-           @updateEvent="update('externalName')"
+  //-         )
+  //-     .grid.grid-cols-9.mb-2.items-center
+  //-       .col-span-2
+  //-         .text-sm 公開状態
+  //-       .col-start-3.col-span-7
+  //-         v-select.text-sm.text-gray-300(
+  //-           v-model="currentPosition.status"
+  //-           placeholder="未入力"
+  //-           :options="statusList"
+  //-           :reduce="status => status.en"
+  //-           label="ja"
+  //-           :class="'v-select-custom-style'"
+  //-           name="status"
+  //-           @input="update('status')"
+  //-         )
+  //-           template(#selected-option="option")
+  //-             .text-sm {{ option.ja }}
+  //-           template(v-slot:option="option")
+  //-             .text-sm {{ option.ja }}
 </template>
 
 <script>
