@@ -120,7 +120,7 @@
               v-row(
                 dense
               )
-                v-col.py-1.grey--text(
+                v-col.py-2.grey--text(
                   cols="2"
                 ) 外部公開名
                 v-col.py-0(
@@ -144,7 +144,7 @@
               v-row(
                 dense
               )
-                v-col.py-1.grey--text(
+                v-col.py-2.grey--text(
                   cols="2"
                 ) 公開状態
                 v-col.py-0(

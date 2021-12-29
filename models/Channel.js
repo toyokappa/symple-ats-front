@@ -10,7 +10,7 @@ export default class Channel extends Model {
       name: this.string(''),
       category: this.string(''),
       automation: this.string(''),
-      applyToken: this.string(''),
+      applyToken: this.attr(null),
     }
   }
 
@@ -24,6 +24,12 @@ export default class Channel extends Model {
 
   get automationJa() {
     return automationList.find((locale) => locale.en === this.automation).ja
+  }
+
+  get applyUrl() {
+    return !!this.applyToken
+      ? `https://apply.symple.com/${this.applyToken}`
+      : '-'
   }
 }
 
@@ -41,7 +47,7 @@ export const categoryList = [
   {
     en: 'scout',
     ja: 'スカウト',
-    color: 'yellow',
+    color: 'amber',
   },
   {
     en: 'sns',
@@ -51,7 +57,7 @@ export const categoryList = [
   {
     en: 'referral',
     ja: 'リファーラル',
-    color: 'purple',
+    color: 'deep-purple',
   },
   {
     en: 'other',
@@ -65,3 +71,9 @@ export const automationList = [
   { en: 'enable', ja: '連携済み' },
   { en: 'impossible', ja: '連携不可' },
 ]
+
+// Validations
+
+export const nameRules = [(v) => !!v || 'チャネル名は入力が必須です']
+
+export const categoryRules = [(v) => !!v || 'チャネル種別は入力が必須です']
