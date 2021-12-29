@@ -61,6 +61,7 @@ v-app
 
 <script>
 export default {
+  name: 'signedIn',
   middleware: ['checkOrganization'],
   data() {
     return {
