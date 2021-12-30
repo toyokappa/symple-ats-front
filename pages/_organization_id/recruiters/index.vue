@@ -1,122 +1,164 @@
 <template lang="pug">
-.w-full
-  .p-8
-    .text-2xl.font-bold.mb-5 リクルーター管理
+.px-8.py-4
+  h2.mb-5 リクルーター管理
 
-    //- 検索UI（一旦後回し）
-    .flex.justify-end.mb-2
-      input.text-sm.border.border-gray-200.rounded.px-2.py-1.w-72.mr-2(type="text" v-model="searchKeyword")
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchRole" :class="dummyPlaceholder(searchRole)")
-        option(value="" selected) 権限で絞り込む
-        option(v-for="role in roleList" :value="role.en" :key="role.en") {{ role.ja }}
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="searchLevel" :class="dummyPlaceholder(searchLevel)")
-        option(:value="null" selected) 利用練度で絞り込む
-        option(v-for="level in levelList" :value="level" :key="level") Lv. {{ level }}
-      button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(@click="$refs.invitationModal.openModal()") リクルーターを招待する
+  //- 検索UI
+  v-row(no-gutters).mb-2
+    v-col(
+      offset-md="4"
+      md="8"
+    )
+      .d-flex.align-center
+        v-text-field.body-2.me-3(
+          v-model="searchKeyword"
+          append-icon="mdi-magnify"
+          placeholder="キーワードで絞り込む"
+          dense
+          hide-details
+        )
+        v-autocomplete.body-2.me-3(
+          v-model="searchRole"
+          :items="roleList"
+          item-text="ja"
+          item-value="en"
+          placeholder="権限で絞り込む"
+          dense
+          hide-details
+        )
+        v-btn(
+          small
+          depressed
+          height="32"
+          @click.stop="createDialog = true"
+        ) リクルーターを招待する
 
-    //- 一覧UI
-    table.w-full
-      thead.text-sm.text-left.border-t.border-b.border-gray-200
-        tr
-          parts-table-head-column 名前
-          parts-table-head-column メールアドレス
-          parts-table-head-column 権限
-          parts-table-head-column 利用練度
-      tbody.text-sm
-        tr(
-          v-for="invitation in invitationList"
-          :key="'invitation' + invitation.id"
-          :class="'hover:bg-gray-100'"
-        )
-          parts-table-body-column
-            .text-sm.text-gray-400() 招待中...
-          parts-table-body-column {{ invitation.email }}
-          parts-table-body-column {{ invitation.roleJa }}
-          parts-table-body-column -
-        tr.cursor-pointer(
-          v-for="recruiter in recruiterList"
-          :key="recruiter.id"
-          :class="'hover:bg-gray-100'"
-          @click="openEditModal(recruiter)"
-        )
-          parts-table-body-column
-            parts-recruiter(v-if="recruiter.nickname" :recruiter="recruiter")
-            .text-sm.text-gray-400(v-else) 未入力
-          parts-table-body-column {{ recruiter.email }}
-          parts-table-body-column {{ recruiter.roleJa }}
-          parts-table-body-column Lv. {{ recruiter.level }}
+  //- 一覧UI
+  v-data-table(
+    :headers="headers"
+    :items="allList"
+    hide-default-footer
+    item-key="email"
+  )
+    template(v-slot:item="{ item }")
+      tr.cursor-pointer(@click.stop="openUpdateDialog(item)")
+        td.text-start {{ item.nickname }}
+        td.text-start {{ item.email }}
+        td.text-start {{ item.roleJa }}
+        td.text-start {{ item.level }}
 
-    //- 招待UI（一旦後回し）
-    parts-modal(ref="invitationModal")
-      .text-3xl.font-bold.mb-5 リクルーター招待
-      .flex.mb-2(v-for="(invitation, index) in addInvitationList" :key="index")
-        input.text-sm.w-full.border.border-gray-200.rounded.px-2.py-1.mr-2.placeholder-gray-300(
-          type="email"
-          v-model="invitation.email"
-          placeholder="招待先のメールアドレス"
-        )
-        select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(
-          v-model="invitation.role"
-          :class="dummyPlaceholder(invitation.role)"
-        )
-          option(:value="null" selected style="display: none") 付与する権限
-          option(v-for="role in roleList" :value="role.en" :key="role.en") {{ role.ja }}
-        .text-sm.text-gray-300.border.border-gray-200.rounded.px-2.py-1.cursor-pointer(
-          @click="removeInvitation(index)"
-        ) ×
-      .text-sm.text-gray-300.w-full.border.border-gray-200.rounded.px-2.py-1.cursor-pointer.mb-2(
-        @click="addInvitation()"
-      ) + 招待先を更に追加する
-      .text-right
-        button.text-sm.text-white.bg-blue-400.border.rounded.px-2.py-1(
-          @click="sendInvitation()"
-        ) 招待メールを送信する
-
-    //- 編集UI（一旦後回し）
-    parts-modal(ref="recruiterEditModal")
-      template(v-if="currentRecruiter")
-        input.text-3xl.font-bold.outline-none.placeholder-gray-300.mb-5(
-          type="text"
-          v-model="currentRecruiter.nickname"
-          placeholder="名前未入力"
-          ref="nameField"
-        )
-        .grid.grid-cols-6.mb-2.items-center
-          .text-sm メールアドレス
-          .col-start-2.col-span-5
-            .text-sm.px-2(:class="'py-0.5'") {{ currentRecruiter.email }}
-        .grid.grid-cols-6.mb-2.items-center
-          .text-sm 権限
-          .col-start-2.col-span-5
-            v-select.text-sm.text-gray-300(
-              v-model="currentRecruiter.role"
-              placeholder="未入力"
-              :options="roleList"
-              label="ja"
-              :reduce="role => role.en"
-              :class="'v-select-custom-style'"
+  //- 招待UI
+  v-dialog(
+    v-model="createDialog"
+    max-width="800"
+  )
+    v-card
+      v-container
+        v-card-title
+          h3 リクルーター招待
+        v-card-text
+          v-form(
+            v-model="valid.create"
+            lazy-validation
+            ref="createForm"
+          )
+            v-row(
+              v-for="(addInvitation, index) in addInvitationList"
+              :key="index"
+              align="center"
+              dense
             )
-              template(#selected-option="option")
-                .text-sm {{ option.ja }}
-              template(v-slot:option="option")
-                .text-sm {{ option.ja }}
-        .grid.grid-cols-6.mb-2.items-center
-          .text-sm 利用練度
-          .col-start-2.col-span-5
-            v-select.text-sm.text-gray-300(
-              v-model="currentRecruiter.level"
-              placeholder="未入力"
-              :options="levelList"
-              :class="'v-select-custom-style'"
+              v-col(cols="8")
+                v-text-field.body-2(
+                  v-model="addInvitation.email"
+                  :rules="emailRules"
+                  placeholder="招待先のメールアドレス"
+                )
+              v-col(cols="4")
+                v-autocomplete.body-2(
+                  v-model="addInvitation.role"
+                  :rules="roleRules"
+                  :items="roleList"
+                  item-text="ja"
+                  item-value="en"
+                  placeholder="付与する権限"
+                  append-outer-icon="mdi-delete"
+                  @click:append-outer="remove"
+                )
+            .mb-3
+              .d-flex.align-center.justify-space-between
+                v-btn(
+                  text
+                  @click="add"
+                )
+                  v-icon mdi-expand-all
+                  .ms-1 招待先を更に追加する
+                v-btn(
+                  depressed
+                  @click="send"
+                )
+                  span 招待メールを送信する
+
+  //- 編集UI（一旦後回し）
+  template(v-if="currentRecruiter")
+    v-dialog(
+      v-model="updateDialog"
+      max-width="800"
+    )
+      v-card
+        v-container
+          v-card-text
+            .text-h5.font-weight-bold.mb-3 {{ currentRecruiter.nickname }}
+            v-row(
+              align="center"
+              dense
             )
-              template(#selected-option="option")
-                .text-sm Lv. {{ option.label }}
-              template(v-slot:option="option")
-                .text-sm Lv. {{ option.label }}
+              v-col.grey--text(
+                cols="2"
+              ) メールアドレス
+              v-col.px-5(
+                cols="10"
+              ) {{ currentRecruiter.email }}
+            v-row(
+              dense
+            )
+              v-col.py-2.grey--text(
+                cols="2"
+              ) 権限
+              v-col.py-0(
+                cols="10"
+              )
+                v-autocomplete.body-2(
+                  v-model="currentRecruiter.role"
+                  append-icon=""
+                  :items="roleList"
+                  item-text="ja"
+                  item-value="en"
+                  :flat="flat.role"
+                  solo
+                  dense
+                  hide-details="auto"
+                  @focus="flat.role = false"
+                  @blur="flat.role= true"
+                )
+            v-row(
+              align="center"
+              dense
+            )
+              v-col.grey--text(
+                cols="2"
+              ) 利用練度
+              v-col.px-5(
+                cols="10"
+              ) {{ currentRecruiter.level }}
 </template>
 
 <script>
-import Recruiter, { roleList, levelList } from '@/models/Recruiter'
+import Recruiter, {
+  roleList,
+  nameRules,
+  emailRules,
+  roleRules,
+} from '@/models/Recruiter'
 import RecruiterInvitation from '@/models/RecruiterInvitation'
 
 export default {
@@ -132,11 +174,26 @@ export default {
   },
   data() {
     return {
+      headers: [
+        { text: '名前', value: 'nickname' },
+        { text: 'メールアドレス', value: 'email' },
+        { text: '権限', value: 'roleJa' },
+        { text: '利用練度', value: 'level' },
+      ],
       roleList,
-      levelList,
+      nameRules,
+      emailRules,
+      roleRules,
+      valid: {
+        create: true,
+      },
+      flat: {
+        role: true,
+      },
       searchKeyword: '',
       searchRole: '',
-      searchLevel: null,
+      createDialog: false,
+      updateDialog: false,
       addInvitationList: [
         {
           email: '',
@@ -147,19 +204,18 @@ export default {
     }
   },
   methods: {
-    dummyPlaceholder(value) {
-      return !value ? 'text-gray-300' : ''
-    },
-    addInvitation() {
+    add() {
       const invitation = { email: '', role: '' }
       this.addInvitationList = [...this.addInvitationList, invitation]
     },
-    removeInvitation(index) {
+    remove(index) {
       this.addInvitationList.splice(index, 1)
     },
-    async sendInvitation() {
+    async send() {
       if (this.addInvitationList.length === 0) return
-      // TODO: バリデーションロジックは追加する
+
+      await this.$refs.createForm.validate()
+      if (!this.valid.create) return
 
       const newInvitationList = await Promise.all(
         this.addInvitationList.map(async (invitation) => {
@@ -178,14 +234,11 @@ export default {
       RecruiterInvitation.insert({ data: newInvitationList })
 
       this.addInvitationList = [{ email: '', role: '' }]
-      this.$refs.invitationModal.closeModal()
+      this.createDialog = false
     },
-    openEditModal(recruiter) {
+    openUpdateDialog(recruiter) {
       this.currentRecruiter = recruiter
-      this.$refs.recruiterEditModal.openModal()
-      this.$nextTick(() => {
-        this.$refs.nameField.focus()
-      })
+      this.updateDialog = true
     },
   },
   computed: {
@@ -197,7 +250,8 @@ export default {
         .where((invitation) => {
           return (
             invitation.email.indexOf(this.searchKeyword) !== -1 &&
-            invitation.role.indexOf(this.searchRole) !== -1
+            (invitation.role.indexOf(this.searchRole) !== -1 ||
+              this.searchRole === null)
           )
         })
         .get()
@@ -208,10 +262,14 @@ export default {
           return (
             (recruiter.nickname.indexOf(this.searchKeyword) !== -1 ||
               recruiter.email.indexOf(this.searchKeyword) !== -1) &&
-            recruiter.role.indexOf(this.searchRole) !== -1
+            (recruiter.role.indexOf(this.searchRole) !== -1 ||
+              this.searchRole === null)
           )
         })
         .get()
+    },
+    allList() {
+      return this.invitationList.concat(this.recruiterList)
     },
   },
 }

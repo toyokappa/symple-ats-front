@@ -26,3 +26,16 @@ export const roleList = [
 ]
 
 export const levelList = [1, 2, 3]
+
+// Validations
+
+export const nameRules = [(v) => !!v || '名前は入力が必須です']
+
+const EMAIL_REGEXP =
+  /^[a-zA-Z0-9.!\#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+export const emailRules = [
+  (v) => !!v || 'メールアドレスは入力が必須です',
+  (v) => EMAIL_REGEXP.test(v) || '正しいメールアドレスを入力してください',
+]
+
+export const roleRules = [(v) => !!v || '権限は入力が必須です']

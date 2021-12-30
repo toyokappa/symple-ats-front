@@ -12,8 +12,16 @@ export default class RecruiterInvitation extends Model {
     }
   }
 
+  get nickname() {
+    return '招待中...'
+  }
+
   get roleJa() {
     return roleList.find((locale) => locale.en === this.role).ja
+  }
+
+  get level() {
+    return '-'
   }
 }
 
