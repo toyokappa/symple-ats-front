@@ -152,7 +152,7 @@
                       dense
                       hide-details="auto"
                       @focus="flat.category = false"
-                      @blur="flattenAndUpdate('category')"
+                      @blur="update('category')"
                     )
                       template(v-slot:selection="{ item }")
                         v-chip(
@@ -284,14 +284,11 @@ export default {
         { channel }
       )
       Channel.update({ data })
+      this.flat[field] = true
     },
     openUpdateDialog(channel) {
       this.currentChannel = channel
       this.updateDialog = true
-    },
-    flattenAndUpdate(field) {
-      this.flat[field] = true
-      this.update(field)
     },
   },
   computed: {

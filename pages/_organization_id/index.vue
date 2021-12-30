@@ -1,7 +1,165 @@
 <template lang="pug"> 
 .p-5
-  parts-kanban-column(:kanban="selectionList" :openModal="openModal")
-  parts-modal(ref="kanbanModal")
+  parts-kanban-column(
+    :kanban="selectionList"
+    :openDialog="openDialog"
+  )
+  template(v-if="currentCard")
+    v-dialog(
+      v-model="dialog"
+      max-width="800"
+    )
+      v-card
+        v-container
+          v-card-text
+            v-text-field.text-h5.font-weight-bold.mb-2(
+              v-model="currentCard.name"
+              flat
+              solo
+              dense
+              autofocus
+              placeholder="名前未入力"
+              hide-details="auto"
+              @blur="update('name')"
+            )
+            v-container
+              v-row(
+                dense
+              )
+                v-col.py-2.grey--text(
+                  cols="2"
+                ) 選考状況
+                v-col.py-0(
+                  cols="10"
+                )
+                  v-autocomplete.body-2(
+                    v-model="currentCard.recruitmentSelectionId"
+                    append-icon=""
+                    :items="selectionList"
+                    item-text="name"
+                    item-value="id"
+                    :flat="flat.recruitmentSelectionId"
+                    solo
+                    dense
+                    hide-details="auto"
+                    @focus="flat.recruitmentSelectionId = false"
+                    @blur="update('recruitmentSelectionId')"
+                  )
+                    template(v-slot:selection="{ item }")
+                      v-chip(
+                        small
+                        label
+                      ) {{ item.name }}
+                    template(v-slot:item="{ item }")
+                      v-chip(
+                        small
+                        label
+                       ) {{ item.name }}
+              v-row(
+                dense
+              )
+                v-col.py-2.grey--text(
+                  cols="2"
+                ) 採用担当
+                v-col.py-0(
+                  cols="10"
+                )
+                  v-autocomplete.body-2(
+                    v-model="currentCard.recruiterId"
+                    append-icon=""
+                    :items="recruiterList"
+                    item-text="nickname"
+                    item-value="id"
+                    :flat="flat.recruiterId"
+                    solo
+                    dense
+                    hide-details="auto"
+                    @focus="flat.recruiterId = false"
+                    @blur="update('recruiterId')"
+                  )
+                    template(v-slot:selection="{ item }")
+                      v-avatar.me-1(
+                        color="grey"
+                        size="18"
+                      )
+                        span.white--text.subtitle-2 {{ item.nickname[0] }}
+                      span.subtitle-2 {{ item.nickname }}
+                    template(v-slot:item="{ item }")
+                      v-avatar.me-1(
+                        color="grey"
+                        size="18"
+                      )
+                        span.white--text.subtitle-2 {{ item.nickname[0] }}
+                      span.subtitle-2 {{ item.nickname }}
+              v-row(
+                dense
+              )
+                v-col.py-2.grey--text(
+                  cols="2"
+                ) 応募経路
+                v-col.py-0(
+                  cols="10"
+                )
+                  v-autocomplete.body-2(
+                    v-model="currentCard.channelId"
+                    append-icon=""
+                    :items="channelList"
+                    item-text="name"
+                    item-value="id"
+                    :flat="flat.channelId"
+                    solo
+                    dense
+                    hide-details="auto"
+                    @focus="flat.channelId = false"
+                    @blur="update('channelId')"
+                  )
+                    template(v-slot:selection="{ item }")
+                      v-chip(
+                        :color="item.categoryColor + ' lighten-1'"
+                        small
+                        label
+                      )
+                        .white--text.font-weight-bold {{ item.name }}
+                    template(v-slot:item="{ item }")
+                      v-chip(
+                        :color="item.categoryColor + ' lighten-1'"
+                        small
+                        label
+                      )
+                        .white--text.font-weight-bold {{ item.name }}
+              v-row(
+                dense
+              )
+                v-col.py-2.grey--text(
+                  cols="2"
+                ) ポジション
+                v-col.py-0(
+                  cols="10"
+                )
+                  v-autocomplete.body-2(
+                    v-model="currentCard.positionId"
+                    append-icon=""
+                    :items="positionList"
+                    item-text="internalName"
+                    item-value="id"
+                    :flat="flat.positionId"
+                    solo
+                    dense
+                    hide-details="auto"
+                    @focus="flat.positionId = false"
+                    @blur="update('positionId')"
+                  )
+                    template(v-slot:selection="{ item }")
+                      v-chip(
+                        small
+                        label
+                       ) {{ item.internalName }}
+                    template(v-slot:item="{ item }")
+                      v-chip(
+                        small
+                        label
+                      ) {{ item.internalName }}
+  //- parts-modal(ref="kanbanModal")
     template(v-if="currentCard")
       parts-form-title-like-text-field(
         v-model="currentCard.name"
@@ -150,17 +308,21 @@ export default {
   },
   data() {
     return {
+      dialog: false,
       currentCard: null,
       resultList,
+      flat: {
+        recruitmentSelectionId: true,
+        recruiterId: true,
+        channelId: true,
+        positionId: true,
+      },
     }
   },
   methods: {
-    openModal(card) {
+    openDialog(card) {
       this.currentCard = card
-      this.$refs.kanbanModal.openModal()
-      this.$nextTick(() => {
-        this.$refs.nameField.focus()
-      })
+      this.dialog = true
     },
     async update(field) {
       // 更新したフィールドのみ更新を走らせる
@@ -175,20 +337,7 @@ export default {
         { candidate }
       )
       Candidate.update({ data })
-    },
-    async updateAssociation(association) {
-      // 更新したフィールドのみ更新を走らせる
-      const acSnakeCase = association.replace(
-        /[A-Z]/g,
-        (s) => '_' + s[0].toLowerCase()
-      )
-      let candidate = {}
-      candidate[`${acSnakeCase}_id`] = this.currentCard[association].id
-      const { data } = await this.$axios.put(
-        `/candidates/${this.currentCard.id}`,
-        { candidate }
-      )
-      Candidate.update({ data })
+      this.flat[field] = true
     },
     async updateHistory(currentHistory, field) {
       // 更新したフィールドのみ更新を走らせる

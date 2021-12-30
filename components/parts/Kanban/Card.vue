@@ -14,7 +14,7 @@ draggable(
   v-card.mb-2(
     v-for="card in cardList"
     :key="card.id"
-    @click="openModal(card)"
+    @click.stop="openDialog(card)"
   )
     v-card-text
       .body-2(v-if="card.name") {{ card.name }}
@@ -24,7 +24,7 @@ draggable(
           color="grey"
           size="18"
         )
-          span.white--text.subtitle-2 t
+          span.white--text.subtitle-2 {{ card.recruiter.nickname[0] }}
         span.subtitle-2 {{ card.recruiter.nickname }}
       .mt-1(v-if="card.channel")
         v-chip(
@@ -37,8 +37,7 @@ draggable(
         v-chip(
           small
           label
-        )
-          .white--text.font-weight-bold {{ card.position.internalName }}
+        ) {{ card.position.internalName }}
 </template>
 
 <script>
@@ -53,7 +52,7 @@ export default {
       type: Number,
       required: true,
     },
-    openModal: {
+    openDialog: {
       type: Function,
       required: true,
     },

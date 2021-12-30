@@ -139,7 +139,7 @@
                       placeholder="未入力"
                       hide-details="auto"
                       @focus="flat.externalName = false"
-                      @blur="flattenAndUpdate('externalName')"
+                      @blur="update('externalName')"
                     )
               v-row(
                 dense
@@ -161,7 +161,7 @@
                     dense
                     hide-details="auto"
                     @focus="flat.status = false"
-                    @blur="flattenAndUpdate('status')"
+                    @blur="update('status')"
                   )
 </template>
 
@@ -257,10 +257,7 @@ export default {
         { position }
       )
       Position.update({ data })
-    },
-    flattenAndUpdate(field) {
       this.flat[field] = true
-      this.update(field)
     },
     openUpdateDialog(position) {
       this.currentPosition = position

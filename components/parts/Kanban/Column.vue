@@ -21,7 +21,7 @@ draggable(
         parts-kanban-card(
           :cardList="column.candidates"
           :columnId="column.id"
-          :openModal="openModal"
+          :openDialog="openDialog"
         )
         v-card.mb-2(
           v-show="createColumnId === column.id"
@@ -54,7 +54,7 @@ export default {
       type: Array,
       required: true,
     },
-    openModal: {
+    openDialog: {
       type: Function,
       required: true,
     },
