@@ -8,12 +8,16 @@ draggable(
   :disabled="false",
   item-key="id"
 )
-  transition-group(class="inline-flex" type="transition" :name="!drag ? 'flip-list' : null")
-    .bg-white.w-72.h-full.rounded.border.border-gray-200.mx-2(v-for="column in kanban" :key="column.id")
-      .bg-gray-100.px-3.py-2.flex.justify-content-start.cursor-pointer.overflow-y-clip
-        h3.text-sm.mr-2 {{ column.name }}
-        .text-sm.text-gray-500 {{ column.candidates.length }}
-      .kanban-column.bg-white.p-3.overflow-y-scroll
+  transition-group(class="d-inline-flex" type="transition" :name="!drag ? 'flip-list' : null")
+    v-card.mx-2(
+      v-for="column in kanban" :key="column.id"
+      outlined
+      width="18rem"
+    )
+      .grey.lighten-3.px-3.py-2.d-flex.justify-start.cursor-pointer
+        h3.text-body-2.font-weight-bold.me-2 {{ column.name }}
+        .text-body-2.grey--text {{ column.candidates.length }}
+      .kanban-column.white.pa-3.overflow-y-scroll
         parts-kanban-card(
           :cardList="column.candidates"
           :columnId="column.id"
@@ -28,11 +32,13 @@ draggable(
             @keydown.enter="appendCard"
             @blur="appendCard"
           )
-        .bg-white.rounded.border.border-gray-200.px-3.py-2.cursor-pointer(
+        v-card.kanban-card(
           v-if="['document', 'interview', 'offer', 'consent'].includes(column.selectionType)"
+          outlined
+          link
           @click="displayCreateForm(column.id)"
         )
-          .text-sm.text-gray-400 + 新規作成
+          v-card-text + 新規作成
 </template>
 
 <script>
@@ -89,4 +95,6 @@ export default {
   opacity: 0.5
 .kanban-column
   max-height: calc(100vh - 36px - 2.5rem)
+.kanban-card
+  padding: 1rem !important
 </style>
