@@ -23,11 +23,16 @@ draggable(
           :columnId="column.id"
           :openModal="openModal"
         )
-        .bg-white.rounded.border.border-gray-200.px-3.py-2.mb-2(v-show="createColumnId === column.id")
-          input.text-sm.outline-none(
-            type="text"
+        v-card.mb-2(
+          v-show="createColumnId === column.id"
+          outlined
+        )
+          v-text-field.body-2(
+            solo
+            flat
+            hide-details
             placeholder="候補者名を入力"
-            :ref="`column${column.id}`"
+            autofocus
             v-model="nameField"
             @keydown.enter="appendCard"
             @blur="appendCard"
@@ -36,7 +41,7 @@ draggable(
           v-if="['document', 'interview', 'offer', 'consent'].includes(column.selectionType)"
           outlined
           link
-          @click="displayCreateForm(column.id)"
+          @click="createColumnId = column.id"
         )
           v-card-text + 新規作成
 </template>
@@ -62,12 +67,6 @@ export default {
     }
   },
   methods: {
-    displayCreateForm(columnId) {
-      this.createColumnId = columnId
-      this.$nextTick(() => {
-        this.$refs[`column${columnId}`][0].focus()
-      })
-    },
     async appendCard(event) {
       if (event.keyCode && event.keyCode !== 13) return // 日本語変換確定のエンターは対象外
       if (!this.createColumnId) return // keydownとblurが2重発火するのでその対策
