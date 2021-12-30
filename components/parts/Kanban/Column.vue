@@ -32,7 +32,7 @@ draggable(
             @keydown.enter="appendCard"
             @blur="appendCard"
           )
-        v-card.kanban-card(
+        v-card(
           v-if="['document', 'interview', 'offer', 'consent'].includes(column.selectionType)"
           outlined
           link
@@ -95,6 +95,4 @@ export default {
   opacity: 0.5
 .kanban-column
   max-height: calc(100vh - 36px - 2.5rem)
-.kanban-card
-  padding: 1rem !important
 </style>

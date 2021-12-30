@@ -54,7 +54,7 @@ v-app
             )
               v-list-item-content
                 v-list-item-subtitle ログアウト
-  v-main
+  v-main.overflow-x-auto
     v-container(fluid)
       nuxt
 </template>
