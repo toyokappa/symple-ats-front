@@ -159,74 +159,45 @@
                         small
                         label
                       ) {{ item.internalName }}
+            v-container
+              v-card.mb-3(
+                v-for="history in currentCard.recruitmentHistories" :key="history.id"
+                outlined
+              )
+                .grey.lighten-3.px-3.py-2.cursor-pointer
+                  v-row(
+                    align="center"
+                  )
+                    v-col(
+                      cols="5"
+                    )
+                      .d-flex.align-center
+                        .text-body-2.font-weight-bold.me-2 {{ history.recruitmentSelection.name }}
+                        v-autocomplete.body-2.grey--text.history-result(
+                          v-if="['document', 'interview'].includes(history.recruitmentSelection.selectionType)"
+                          v-model="history.result"
+                          append-icon=""
+                          :items="resultList"
+                          item-text="ja"
+                          item-value="en"
+                          placeholder="未入力"
+                          :background-color="history.editing ? 'inherit' : 'transparent'"
+                          :flat="!history.editing"
+                          solo
+                          dense
+                          hide-details="auto"
+                          :ref="`history${history.id}`"
+                          @focus="history.editing = true"
+                          @blur="updateHistory(history, 'result')"
+                        )
+                    v-col(
+                      offset="4"
+                      cols="3"
+                    )
+                      .text-body-2(
+                      ) 2021.12.31
   //- parts-modal(ref="kanbanModal")
     template(v-if="currentCard")
-      parts-form-title-like-text-field(
-        v-model="currentCard.name"
-        @updateEvent="update('name')"
-        ref="nameField"
-      )
-      .grid.grid-cols-6.mb-2.items-center
-        .text-sm 選考状態
-        .col-start-2.col-span-5
-          v-select.text-sm.text-gray-300(
-            v-model="currentCard.recruitmentSelectionId"
-            placeholder="未入力"
-            :options="selectionList"
-            label="name"
-            :reduce="selection => selection.id"
-            :class="'v-select-custom-style'"
-            @input="update('recruitmentSelectionId')"
-          )
-            template(#selected-option="option")
-              .inline-block.text-xs.rounded.bg-gray-100.px-2(:class="'py-0.5'") {{ option.name }}
-            template(v-slot:option="option")
-              .inline-block.text-xs.rounded.bg-gray-100.px-2(:class="'py-0.5'") {{ option.name }}
-      .grid.grid-cols-6.mb-2.items-center
-        .text-sm 担当者
-        .col-start-2.col-span-5
-          v-select.text-sm.text-gray-300(
-            v-model="currentCard.recruiter"
-            placeholder="未入力"
-            :options="recruiterList"
-            label="nickname"
-            :class="'v-select-custom-style'"
-            @input="updateAssociation('recruiter')"
-          )
-            template(#selected-option="option")
-              parts-recruiter(:recruiter="option")
-            template(v-slot:option="option")
-              parts-recruiter(:recruiter="option")
-      .grid.grid-cols-6.mb-2.items-center
-        .text-sm 応募媒体
-        .col-start-2.col-span-5
-          v-select.text-sm.text-gray-300(
-            v-model="currentCard.channel"
-            placeholder="未入力"
-            :options="channelList"
-            label="name"
-            :class="'v-select-custom-style'"
-            @input="updateAssociation('channel')"
-          )
-            template(#selected-option="option")
-              parts-channel(:channel="option")
-            template(v-slot:option="option")
-              parts-channel(:channel="option")
-      .grid.grid-cols-6.mb-2.items-center
-        .text-sm ポジション
-        .col-start-2.col-span-5
-          v-select.text-sm.text-gray-300(
-            v-model="currentCard.position"
-            placeholder="未入力"
-            :options="positionList"
-            label="internalName"
-            :class="'v-select-custom-style'"
-            @input="updateAssociation('position')"
-          )
-            template(#selected-option="option")
-              parts-position(:position="option")
-            template(v-slot:option="option")
-              parts-position(:position="option")
 
       //- 選考履歴
       .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="history in currentCard.recruitmentHistories" :key="history.id")
@@ -316,6 +287,7 @@ export default {
         recruiterId: true,
         channelId: true,
         positionId: true,
+        result: true,
       },
     }
   },
@@ -352,6 +324,7 @@ export default {
         { history }
       )
       RecruitmentHistory.update({ data })
+      currentHistory.editing = false
     },
   },
   computed: {
@@ -371,4 +344,8 @@ export default {
 }
 </script>
 
-<style lang="sass"></style>
+<style lang="sass">
+.history-result
+  .v-input__control
+    min-height: inherit !important
+</style>

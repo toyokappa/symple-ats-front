@@ -16,6 +16,7 @@ export default class RecruitmentHistory extends Model {
         RecruitmentSelection,
         'recruitmentSelectionId'
       ),
+      editing: this.boolean(false),
     }
   }
 }
