@@ -173,7 +173,7 @@
                     )
                       .d-flex.align-center
                         .text-body-2.font-weight-bold.me-2 {{ history.recruitmentSelection.name }}
-                        v-autocomplete.body-2.grey--text.history-result(
+                        v-autocomplete.body-2.grey--text(
                           v-if="['document', 'interview'].includes(history.recruitmentSelection.selectionType)"
                           v-model="history.result"
                           append-icon=""
@@ -181,76 +181,43 @@
                           item-text="ja"
                           item-value="en"
                           placeholder="未入力"
-                          :background-color="history.editing ? 'inherit' : 'transparent'"
-                          :flat="!history.editing"
+                          :background-color="history.resultEditing ? 'inherit' : 'transparent'"
+                          :flat="!history.resultEditing"
                           solo
                           dense
                           hide-details="auto"
                           :ref="`history${history.id}`"
-                          @focus="history.editing = true"
-                          @blur="updateHistory(history, 'result')"
+                          @focus="history.resultEditing = true"
+                          @blur="history.resultEditing = false"
+                          @input="updateHistory(history, 'result')"
                         )
                     v-col(
                       offset="4"
                       cols="3"
                     )
-                      .text-body-2(
-                      ) 2021.12.31
-  //- parts-modal(ref="kanbanModal")
-    template(v-if="currentCard")
-
-      //- 選考履歴
-      .bg-white.w-full.rounded.border.border-gray-200.mb-3(v-for="history in currentCard.recruitmentHistories" :key="history.id")
-        .bg-gray-100.px-3.py-2.flex.justify-content-start.items-center
-          h3.text-sm.mr-5 {{ history.recruitmentSelection.name }}
-          .text-sm.text-gray-500(
-            v-if="['document', 'interview'].includes(history.recruitmentSelection.selectionType)"
-          )
-            v-select.text-sm.text-gray-500.w-32(
-              v-model="history.result"
-              placeholder="未選考"
-              :options="resultList"
-              label="ja"
-              :reduce="result => result.en"
-              :class="'v-select-custom-style-bg-gray'"
-              @input="updateHistory(history, 'result')"
-            )
-              template(#selected-option="option")
-                .text-gray-500 {{ option.ja }}
-              template(v-slot:option="option")
-                .text-gray-500 {{ option.ja }}
-          .text-sm.text-gray-500.ml-auto
-            v-date-picker(
-              v-model="history.selectedAt"
-              :masks="{ input: 'YYYY.MM.DD' }"
-              :popover="{ visibility: 'focus' }"
-              trim-weeks
-              @input="updateHistory(history, 'selectedAt')"
-            )
-              template(v-slot="{ inputValue, inputEvents }")
-                input.text-sm.text-right.w-24.px-2.py-1.outline-none.rounded.bg-gray-100(
-                  :class="'hover:bg-white focus:bg-white'"
-                  :value="inputValue"
-                  v-on="inputEvents"
-                  placeholder="未入力"
-                )
-
-        //- 選考評価
-        .bg-white.p-3
-        //-   .bg-white.rounded.border.border-gray-200.shadow-sm.p-4.mb-2(v-for="iResult in result.individualResults" :key="iResult.id")
-        //-     .grid.grid-cols-8.mb-3.items-center
-        //-       .text-sm 選考官
-        //-       .col-start-2.col-span-7
-        //-         parts-recruiter(:recruiterId="iResult.recruiterId")
-        //-     .grid.grid-cols-8.mb-3.items-center
-        //-       .text-sm 結果
-        //-       .col-start-2.col-span-7
-        //-         .text-sm {{ iResult.result }}
-        //-     .grid.grid-cols-8.mb-3.items-center
-        //-       .text-sm 入力日
-        //-       .col-start-2.col-span-7
-        //-         parts-date.text-sm(:date="iResult.inputDate")
-        //-     .text-sm {{ iResult.description }}
+                      v-menu(
+                        v-model="history.selectedAtEditing"
+                        :close-on-content-click="false"
+                        offset-y
+                      )
+                        template(v-slot:activator="{ on, attrs }")
+                          v-text-field.body-2.selected-at(
+                            :value="history.selectedAt ? $dateFns.format(history.selectedAtToDate, 'yyyy.MM.dd') : null"
+                            placeholder="未入力"
+                            hide-details="auto"
+                            :background-color="history.selectedAtEditing ? 'inherit' : 'transparent'"
+                            :flat="!history.selectedAtEditing"
+                            solo
+                            dense
+                            readonly
+                            v-bind="attrs"
+                            v-on="on"
+                          )
+                        v-date-picker(
+                          v-model="history.selectedAt"
+                          no-title
+                          @input="updateHistory(history, 'selectedAt')"
+                        )
 </template>
 
 <script>
@@ -324,7 +291,7 @@ export default {
         { history }
       )
       RecruitmentHistory.update({ data })
-      currentHistory.editing = false
+      currentHistory[`${field}Editing`] = false
     },
   },
   computed: {
@@ -345,7 +312,6 @@ export default {
 </script>
 
 <style lang="sass">
-.history-result
-  .v-input__control
-    min-height: inherit !important
+.selected-at input
+  text-align: right
 </style>

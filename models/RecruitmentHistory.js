@@ -16,8 +16,13 @@ export default class RecruitmentHistory extends Model {
         RecruitmentSelection,
         'recruitmentSelectionId'
       ),
-      editing: this.boolean(false),
+      selectedAtEditing: this.boolean(false),
+      resultEditing: this.boolean(false),
     }
+  }
+
+  get selectedAtToDate() {
+    return this.selectedAt ? new Date(this.selectedAt) : null
   }
 }
 
