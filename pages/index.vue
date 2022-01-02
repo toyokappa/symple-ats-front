@@ -3,6 +3,6 @@
 
 <script>
 export default {
-  middleware: ['redirectDefaultOrg'],
+  middleware: ['auth', 'redirectDefaultOrg'],
 }
 </script>

@@ -43,6 +43,7 @@ v-card.py-16.mx-auto(
 <script>
 export default {
   layout: 'auth',
+  middleware: ['auth'],
   data() {
     return {
       recruiter: {

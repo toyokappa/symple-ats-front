@@ -62,7 +62,7 @@ v-app
 <script>
 export default {
   name: 'signedIn',
-  middleware: ['checkOrganization'],
+  middleware: ['auth', 'checkOrganization'],
   data() {
     return {
       navigation: [
