@@ -8,14 +8,17 @@
       select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.position" :class="dummyPlaceholder(filter.position)")
         option(value="" selected) ポジションで絞り込む
         option(v-for="position in positionList" :value="position.id" :key="position.id") {{ position.internalName }}
-    .relative.mb-3
-      .absolute.flex.w-full
-        .flex-1.p-3(v-for="(value, index) in displayValues" :key="index")
-          .text-gray-500 {{ chartLabels[index] }}
-          .text-2xl.font-bold {{ value }}
-          .font-bold.text-gray-500(v-if="index < displayValues.length - 1")
-            span.text-base.mr-px {{ valuePercentage[index] }}
-            span.text-xs %
+    .chart-area.mb-3
+      .chart-text-area
+        .chart-text.pa-3(v-for="(value, index) in displayValues" :key="index")
+          .grey--text.mb-2 {{ chartLabels[index] }}
+          .text-h5.font-weight-bold.mb-1 {{ value }}
+          .grey--text(v-if="index < displayValues.length - 1")
+            template(v-if="isNaN(valuePercentage[index])")
+              span.text-h6.font-weight-bold -
+            template(v-else)
+              span.text-h6.font-weight-bold.percent-value {{ valuePercentage[index] }}
+              span.text-overline.font-weight-bold %
       line-chart(:chartData="chartData" :options="options" :height="150")
     v-data-table(
       :headers="table.headers"
@@ -23,9 +26,15 @@
       hide-default-footer
       key-item="dataName"
     )
-      template(v-slot:item="{ headers, item, index }")
-        tr.cursor-pointer(@click="selectDatasets(index)")
-          td(v-for="header in headers" :key="header.value") {{ item[header.value] }}
+      template(v-slot:item="{ headers, item }")
+        tr.cursor-pointer(
+          :class="{ 'grey lighten-3': currentDataName === item.dataName }"
+          @click="selectDatasets(item.dataName)"
+        )
+          td(v-for="header in headers"
+          :key="header.value"
+          :class="{ 'text-center': header.align === 'center' }"
+        ) {{ item[header.value] }}
 </template>
 
 <script>
@@ -48,6 +57,7 @@ export default {
         position: '',
       },
       currentDatasetsIndex: 0,
+      currentDataName: '全体',
     }
   },
   methods: {
@@ -56,9 +66,8 @@ export default {
         (_, index) => index < this.dataValues.length - 1
       )
     },
-    selectDatasets(index) {
-      console.log('hello')
-      this.currentDatasetsIndex = index
+    selectDatasets(dataName) {
+      this.currentDataName = dataName
     },
     dummyPlaceholder(value) {
       return !value ? 'text-gray-300' : ''
@@ -66,7 +75,9 @@ export default {
   },
   computed: {
     dataValues() {
-      return this.chart.datasets[this.currentDatasetsIndex].values
+      return this.chart.datasets.find(
+        (dataset) => dataset.dataName === this.currentDataName
+      ).values
     },
     chartLabels() {
       return this.chart.labels
@@ -143,4 +154,17 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped></style>
+<style lang="sass" scoped>
+.chart-area
+  position: relative
+  .chart-text-area
+    position: absolute
+    display: flex
+    width: 100%
+    .chart-text
+      flex: 1 1 0%
+      div, span
+        line-height: 1 !important
+      .percent-value
+        margin-right: 1px
+</style>
