@@ -17,26 +17,15 @@
             span.text-base.mr-px {{ valuePercentage[index] }}
             span.text-xs %
       line-chart(:chartData="chartData" :options="options" :height="150")
-    table.w-full
-      thead.text-sm.text-left.border-t.border-b.border-gray-200
-        tr
-          th.px-2.py-3.w-32 区分
-          template(v-for="(label, index) in displayLabels")
-            th.px-2.py-3.text-center {{ label }}
-            template(v-if="index < displayLabels.length - 1")
-              th.px-2.py-3.text-center.text-xs
-      tbody.text-sm
-        tr.cursor-pointer(
-          v-for="(data, index) in analytics.datasets"
-          :class="{ 'bg-gray-100': index === currentDatasetsIndex }"
-          :key="data.dataName"
-          @click="selectDatasets(index)"
-        )
-          td.px-2.py-3 {{ data.dataName }}
-          template(v-for="(value, i) in filterDisplayValues(index)")
-            td.px-2.py-3.text-center {{ value }}
-            template(v-if="i < filterDisplayValues(index).length - 1")
-              td.px-2.py-3.text-center.text-xs {{ (filterDisplayValues(index)[i + 1] / value * 100).toFixed(1) }}%
+    v-data-table(
+      :headers="table.headers"
+      :items="table.datasets"
+      hide-default-footer
+      key-item="dataName"
+    )
+      template(v-slot:item="{ headers, item, index }")
+        tr.cursor-pointer(@click="selectDatasets(index)")
+          td(v-for="header in headers" :key="header.value") {{ item[header.value] }}
 </template>
 
 <script>
@@ -47,7 +36,8 @@ export default {
     const { data: analytics } = await $axios.get(`/${orgId}/analytics`)
     const { data: positionList } = await $axios.get(`/${orgId}/positions`)
     return {
-      analytics,
+      chart: analytics.chart,
+      table: analytics.table,
       positionList,
     }
   },
@@ -62,11 +52,12 @@ export default {
   },
   methods: {
     filterDisplayValues(index) {
-      return this.analytics.datasets[index].values.filter(
+      return this.chart.datasets[index].values.filter(
         (_, index) => index < this.dataValues.length - 1
       )
     },
     selectDatasets(index) {
+      console.log('hello')
       this.currentDatasetsIndex = index
     },
     dummyPlaceholder(value) {
@@ -75,10 +66,10 @@ export default {
   },
   computed: {
     dataValues() {
-      return this.analytics.datasets[this.currentDatasetsIndex].values
+      return this.chart.datasets[this.currentDatasetsIndex].values
     },
     chartLabels() {
-      return this.analytics.labels
+      return this.chart.labels
     },
     displayValues() {
       return this.dataValues.filter(
@@ -96,7 +87,7 @@ export default {
       )
     },
     channelsSelection() {
-      return this.analytics.datasets.map((data) => data.dataName)
+      return this.chart.datasets.map((data) => data.dataName)
     },
     chartData() {
       return {
