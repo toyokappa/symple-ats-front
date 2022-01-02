@@ -1,40 +1,32 @@
 <template lang="pug">
-.w-full
-  .p-8
-    .flex.justify-end.mb-2
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.section" :class="dummyPlaceholder(filter.section)")
-        option(value="" selected) チャネル種別で絞り込む
-        option(v-for="channels in channelsSelection" :value="channels" :key="channels") {{ channels }}
-      select.text-sm.border.border-gray-200.rounded.px-2.py-1.mr-2(v-model="filter.position" :class="dummyPlaceholder(filter.position)")
-        option(value="" selected) ポジションで絞り込む
-        option(v-for="position in positionList" :value="position.id" :key="position.id") {{ position.internalName }}
-    .chart-area.mb-3
-      .chart-text-area
-        .chart-text.pa-3(v-for="(value, index) in displayValues" :key="index")
-          .grey--text.mb-2 {{ chartLabels[index] }}
-          .text-h5.font-weight-bold.mb-1 {{ value }}
-          .grey--text(v-if="index < displayValues.length - 1")
-            template(v-if="isNaN(valuePercentage[index])")
-              span.text-h6.font-weight-bold -
-            template(v-else)
-              span.text-h6.font-weight-bold.percent-value {{ valuePercentage[index] }}
-              span.text-overline.font-weight-bold %
-      line-chart(:chartData="chartData" :options="options" :height="150")
-    v-data-table(
-      :headers="table.headers"
-      :items="table.datasets"
-      hide-default-footer
-      key-item="dataName"
-    )
-      template(v-slot:item="{ headers, item }")
-        tr.cursor-pointer(
-          :class="{ 'grey lighten-3': currentDataName === item.dataName }"
-          @click="selectDatasets(item.dataName)"
-        )
-          td(v-for="header in headers"
-          :key="header.value"
-          :class="{ 'text-center': header.align === 'center' }"
-        ) {{ item[header.value] }}
+.px-8.py-4
+  .chart-area.mb-3
+    .chart-text-area
+      .chart-text.pa-3(v-for="(value, index) in displayValues" :key="index")
+        .grey--text.mb-2 {{ chartLabels[index] }}
+        .text-h5.font-weight-bold.mb-1 {{ value }}
+        .grey--text(v-if="index < displayValues.length - 1")
+          template(v-if="isNaN(valuePercentage[index])")
+            span.text-h6.font-weight-bold -
+          template(v-else)
+            span.text-h6.font-weight-bold.percent-value {{ valuePercentage[index] }}
+            span.text-overline.font-weight-bold %
+    line-chart(:chartData="chartData" :options="options" :height="150")
+  v-data-table(
+    :headers="table.headers"
+    :items="table.datasets"
+    hide-default-footer
+    key-item="dataName"
+  )
+    template(v-slot:item="{ headers, item }")
+      tr.cursor-pointer(
+        :class="{ 'grey lighten-3': currentDataName === item.dataName }"
+        @click="selectDatasets(item.dataName)"
+      )
+        td(v-for="header in headers"
+        :key="header.value"
+        :class="{ 'text-center': header.align === 'center' }"
+      ) {{ item[header.value] }}
 </template>
 
 <script>
@@ -56,7 +48,6 @@ export default {
         section: '',
         position: '',
       },
-      currentDatasetsIndex: 0,
       currentDataName: '全体',
     }
   },
