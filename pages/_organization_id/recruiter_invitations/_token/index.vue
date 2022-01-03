@@ -10,7 +10,12 @@ v-card.py-16.mx-auto(
     ) mdi-lock
     h1.text-center アカウント作成
     p.text-center.subtitle-2.mb-0 以下の情報を全て入力してください。
-  v-form(@submit.prevent="signup")
+  v-form(
+    @submit.prevent="signup"
+    v-model="valid"
+    lazy-validation
+    ref="signupForm"
+  )
     .mb-4
       v-text-field.body-2.mb-3(
         :value="`招待中のメールアドレス: ${invitation.email}`"
@@ -23,6 +28,7 @@ v-card.py-16.mx-auto(
         v-col(cols="6")
           v-text-field.body-2.mb-3(
             v-model="recruiter.lastName"
+            :rules="lastNameRules"
             autofocus
             dense
             outlined
@@ -32,6 +38,7 @@ v-card.py-16.mx-auto(
         v-col(cols="6")
           v-text-field.body-2.mb-3(
             v-model="recruiter.firstName"
+            :rules="firstNameRules"
             dense
             outlined
             hide-details="auto"
@@ -39,6 +46,7 @@ v-card.py-16.mx-auto(
           )
       v-text-field.body-2.mb-3(
         v-model="recruiter.nickname"
+        :rules="nicknameRules"
         dense
         outlined
         hide-details="auto"
@@ -46,6 +54,7 @@ v-card.py-16.mx-auto(
       )
       v-text-field.body-2.mb-3(
         v-model="recruiter.password"
+        :rules="passwordRules"
         :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
         :type="showPassword ? 'text' : 'password'"
         dense
@@ -57,6 +66,7 @@ v-card.py-16.mx-auto(
     .mb-4
       v-checkbox(
         v-model="recruiter.concent"
+        :rules="concentRules"
         hide-details="auto"
       )
         template(v-slot:label)
@@ -80,20 +90,14 @@ v-card.py-16.mx-auto(
 </template>
 
 <script>
-// ロジック整理
-// 1. トークンをもとに招待情報にアクセス
-// 2-1. 招待状が存在する場合
-// 2-1-1. すでに登録アカウントが存在する場合
-// 2-1-1-1. 招待承認処理の実行
-// 2-1-1-2. 招待先の組織のトップページへリダイレクト
-// 2-1-2. 登録アカウントが存在しない場合
-// 2-1-2-1. アカウント登録ページが表示される
-// 2-1-2-2. アカウント登録が完了
-// 2-1-2-3. 該当アカウントでログイン
-// 2-1-2-4. 招待承認処理の実行
-// 2-1-2-5. 招待先の組織のトップページへリダイレクト
-// 2-2. 招待状が存在しない場合
-// 2-2-1. 404ページが表示される
+import {
+  lastNameRules,
+  firstNameRules,
+  nicknameRules,
+  passwordRules,
+  concentRules,
+} from '@/models/Recruiter'
+
 export default {
   layout: 'auth',
   async asyncData({ $axios, params, redirect }) {
@@ -111,17 +115,26 @@ export default {
   data() {
     return {
       recruiter: {
-        firstName: '',
         lastName: '',
+        firstName: '',
         nickname: '',
         password: '',
         concent: false,
       },
+      lastNameRules,
+      firstNameRules,
+      nicknameRules,
+      passwordRules,
+      concentRules,
+      valid: true,
       showPassword: false,
     }
   },
   methods: {
     async signup() {
+      await this.$refs.signupForm.validate()
+      if (!this.valid) return
+
       try {
         await this.$axios.post('/auth', {
           name: `${this.recruiter.lastName} ${this.recruiter.firstName}`,

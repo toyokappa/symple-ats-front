@@ -41,10 +41,10 @@
   )
     template(v-slot:item="{ item }")
       tr.cursor-pointer(@click.stop="openUpdateDialog(item)")
+        td.text-start {{ item.name }}
         td.text-start {{ item.nickname }}
         td.text-start {{ item.email }}
         td.text-start {{ item.roleJa }}
-        td.text-start {{ item.level }}
 
   //- 招待UI
   v-dialog(
@@ -107,7 +107,17 @@
       v-card
         v-container
           v-card-text
-            .text-h5.font-weight-bold.mb-3 {{ currentRecruiter.nickname }}
+            .text-h5.font-weight-bold.mb-3 {{ currentRecruiter.name }}
+            v-row(
+              align="center"
+              dense
+            )
+              v-col.grey--text(
+                cols="2"
+              ) 表示名
+              v-col.px-5(
+                cols="10"
+              ) {{ currentRecruiter.nickname }}
             v-row(
               align="center"
               dense
@@ -140,25 +150,10 @@
                   @focus="flat.role = false"
                   @blur="flat.role= true"
                 )
-            v-row(
-              align="center"
-              dense
-            )
-              v-col.grey--text(
-                cols="2"
-              ) 利用練度
-              v-col.px-5(
-                cols="10"
-              ) {{ currentRecruiter.level }}
 </template>
 
 <script>
-import Recruiter, {
-  roleList,
-  nameRules,
-  emailRules,
-  roleRules,
-} from '@/models/Recruiter'
+import Recruiter, { roleList, emailRules, roleRules } from '@/models/Recruiter'
 import RecruiterInvitation from '@/models/RecruiterInvitation'
 
 export default {
@@ -175,13 +170,12 @@ export default {
   data() {
     return {
       headers: [
-        { text: '名前', value: 'nickname' },
+        { text: '名前', value: 'name' },
+        { text: '表示名', value: 'nickname' },
         { text: 'メールアドレス', value: 'email' },
         { text: '権限', value: 'roleJa' },
-        { text: '利用練度', value: 'level' },
       ],
       roleList,
-      nameRules,
       emailRules,
       roleRules,
       valid: {
@@ -260,7 +254,8 @@ export default {
       return Recruiter.query()
         .where((recruiter) => {
           return (
-            (recruiter.nickname.indexOf(this.searchKeyword) !== -1 ||
+            (recruiter.name.indexOf(this.searchKeyword) !== -1 ||
+              recruiter.nickname.indexOf(this.searchKeyword) !== -1 ||
               recruiter.email.indexOf(this.searchKeyword) !== -1) &&
             (recruiter.role.indexOf(this.searchRole) !== -1 ||
               this.searchRole === null)
