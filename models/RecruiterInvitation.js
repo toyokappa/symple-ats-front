@@ -12,16 +12,16 @@ export default class RecruiterInvitation extends Model {
     }
   }
 
-  get nickname() {
+  get name() {
     return '招待中...'
+  }
+
+  get nickname() {
+    return '-'
   }
 
   get roleJa() {
     return roleList.find((locale) => locale.en === this.role).ja
-  }
-
-  get level() {
-    return '-'
   }
 }
 
@@ -30,5 +30,3 @@ export const roleList = [
   { en: 'interviewer', ja: '面接官' },
   { en: 'viewer', ja: '閲覧者' },
 ]
-
-export const levelList = [1, 2, 3]

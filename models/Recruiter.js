@@ -25,8 +25,6 @@ export const roleList = [
   { en: 'viewer', ja: '閲覧者' },
 ]
 
-export const levelList = [1, 2, 3]
-
 // Validations
 
 const EMAIL_REGEXP =
