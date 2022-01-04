@@ -11,11 +11,16 @@ export default class Recruiter extends Model {
       nickname: this.string(''),
       email: this.string(''),
       role: this.string(''),
+      googleAuthenticated: this.boolean(false),
     }
   }
 
   get roleJa() {
     return roleList.find((locale) => locale.en === this.role).ja
+  }
+
+  get googleAuthenticatedText() {
+    return this.googleAuthenticated ? '連携済み' : '未連携'
   }
 }
 

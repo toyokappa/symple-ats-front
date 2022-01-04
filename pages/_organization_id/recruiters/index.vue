@@ -45,6 +45,7 @@
         td.text-start {{ item.nickname }}
         td.text-start {{ item.email }}
         td.text-start {{ item.roleJa }}
+        td.text-start {{ item.googleAuthenticatedText }}
 
   //- 招待UI
   v-dialog(
@@ -115,7 +116,7 @@
               v-col.grey--text(
                 cols="2"
               ) 表示名
-              v-col.px-5(
+              v-col.px-4(
                 cols="10"
               ) {{ currentRecruiter.nickname }}
             v-row(
@@ -125,7 +126,7 @@
               v-col.grey--text(
                 cols="2"
               ) メールアドレス
-              v-col.px-5(
+              v-col.px-4(
                 cols="10"
               ) {{ currentRecruiter.email }}
             v-row(
@@ -150,6 +151,16 @@
                   @focus="flat.role = false"
                   @blur="flat.role= true"
                 )
+            v-row(
+              align="center"
+              dense
+            )
+              v-col.grey--text(
+                cols="2"
+              ) カレンダー連携
+              v-col.px-4(
+                cols="10"
+              ) {{ currentRecruiter.googleAuthenticatedText }}
 </template>
 
 <script>
@@ -174,6 +185,7 @@ export default {
         { text: '表示名', value: 'nickname' },
         { text: 'メールアドレス', value: 'email' },
         { text: '権限', value: 'roleJa' },
+        { text: 'カレンダー連携', value: 'googleAuthenticatedText' },
       ],
       roleList,
       emailRules,
