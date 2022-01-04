@@ -45,7 +45,10 @@ v-app
               v-list-item-icon(v-if="org.uniqueId === orgId")
                 v-icon(dense) mdi-check-bold
             v-divider.my-2
-            v-list-item(link)
+            v-list-item(
+              link
+              @click.stop="profileDialog = true"
+            )
               v-list-item-content
                 v-list-item-subtitle プロフィール編集
             v-list-item(
@@ -57,9 +60,80 @@ v-app
   v-main.overflow-x-auto
     v-container(fluid)
       nuxt
+  v-dialog(
+    v-if="currentRecruiter"
+    v-model="profileDialog"
+    max-width="800"
+  )
+    v-card
+      v-container
+        v-card-text
+          .text-h5.font-weight-bold.mb-2 プロフィール編集
+          .d-flex.align-center.mb-5
+            v-icon.grey--text(size="16") mdi-help-circle-outline
+            .caption.ms-1.grey--text プロフィールの変更は、すべての組織に適用されます。
+          .body-1.font-weight-bold.mb-3 個人情報
+          v-row.mb-3
+            v-col(cols="6")
+              .grey--text.mb-1 フルネーム
+              v-text-field(
+                v-model="currentRecruiter.name"
+                placeholder="名前"
+                dense
+                outlined
+                hide-details="auto"
+              )
+            v-col(cols="6")
+              .grey--text.mb-1 システム内で表示する名前
+              v-text-field(
+                v-model="currentRecruiter.nickname"
+                placeholder="名前"
+                dense
+                outlined
+                hide-details="auto"
+              )
+          .grey--text.mb-1 メールアドレス
+          .d-flex.align-center
+            .body-1.me-3 {{ currentRecruiter.email }}
+            .caption.grey--text メールアドレスを変更する
+          v-divider.my-5
+          .body-1.font-weight-bold.mb-2 組織内権限
+          template(v-if="currentRecruiter.role === 'admin'")
+            .caption.grey--text.mb-3 組織内権限はプロフィールから変更ができません。リクルーター管理ページより変更を行ってください。
+          template(v-else)
+            .caption.grey--text.mb-3 組織内権限はプロフィールから変更ができません。管理者権限を持つ社内メンバーへ変更の依頼を行ってください。
+          v-text-field(
+            :value="currentRecruiter.roleJa"
+            dense
+            outlined
+            readonly
+            hide-details
+          )
+          v-divider.my-5
+          .body-1.font-weight-bold.mb-2 Googleカレンダー連携
+          .caption.grey--text.mb-3 Googleカレンダーと連携することにより、面接日程の自動設定機能を利用することができます。なお、複数人が出席する面接の自動設定を行う場合は、出席する面接官全員がGoogleカレンダーと連携している必要があります。
+          template(v-if="currentRecruiter.googleAuthenticated")
+            .d-flex.align-center
+              v-icon.green--text.me-1 mdi-check-bold
+              .body-1.green--text.pt-1 Googleカレンダーと連携済み
+          template(v-else)
+            v-btn(
+              outlined
+              link
+              href="http://localhost:7700/auth/google_oauth2"
+            )
+              v-icon(dense) mdi-google
+              span.ms-1 Googleカレンダーを連携する
+          v-divider.my-5
+          .body-1.font-weight-bold.mb-3 パスワード
+          v-btn(
+            outlined
+          ) パスワードを変更する
 </template>
 
 <script>
+import Recruiter from '@/models/Recruiter'
+
 export default {
   name: 'signedIn',
   middleware: ['auth', 'checkOrganization'],
@@ -84,13 +158,10 @@ export default {
           icon: 'mdi-file-document-multiple',
         },
       ],
-      open: false,
+      profileDialog: false,
     }
   },
   methods: {
-    closeDropdown() {
-      this.open = false
-    },
     async signout() {
       await this.$auth.logout()
       localStorage.removeItem('access-token')
@@ -102,6 +173,9 @@ export default {
   computed: {
     orgId() {
       return this.$route.params.organization_id
+    },
+    currentRecruiter() {
+      return Recruiter.find(this.$auth.user.id)
     },
   },
 }
