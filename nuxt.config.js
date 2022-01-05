@@ -23,14 +23,7 @@ export default {
   css: ['@/assets/sass/select.sass'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [
-    '@/plugins/axios',
-    '@/plugins/calendar',
-    '@/plugins/chart',
-    '@/plugins/clickOutside',
-    '@/plugins/draggable',
-    '@/plugins/select',
-  ],
+  plugins: ['@/plugins/axios', '@/plugins/chart', '@/plugins/draggable'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
