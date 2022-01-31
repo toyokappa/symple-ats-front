@@ -115,7 +115,15 @@ v-app
           template(v-if="currentRecruiter.googleAuthenticated")
             .d-flex.align-center
               v-icon.green--text.me-1 mdi-check-bold
-              .body-1.green--text.pt-1 Googleカレンダーと連携済み
+              .body-1.green--text.pt-1.me-3 Googleカレンダーと連携済み
+              v-btn(
+                outlined
+                dense
+                link
+                href="http://localhost:7700/auth/google_oauth2"
+              )
+                v-icon(dense) mdi-google
+                span.ms-1 再連携する
           template(v-else)
             v-btn(
               outlined
