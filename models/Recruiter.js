@@ -12,6 +12,7 @@ export default class Recruiter extends Model {
       email: this.string(''),
       role: this.string(''),
       googleAuthenticated: this.boolean(false),
+      googleOauth2Email: this.attr(null),
     }
   }
 
