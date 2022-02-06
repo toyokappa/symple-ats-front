@@ -306,7 +306,29 @@
                       outlined
                       link
                     )
-                      v-card-text + 面接官を追加
+                      v-autocomplete.body-2.pa-3(
+                        v-model="newEvaluation.recruiterId"
+                        append-icon=""
+                        :items="recruiterList"
+                        item-text="nickname"
+                        item-value="id"
+                        placeholder="+ 面接官を追加"
+                        flat
+                        solo
+                        dense
+                        hide-details="auto"
+                        :ref="`newEvaluation${history.id}`"
+                        @input="createEvaluation(history.id, newEvaluation.recruiterId)"
+                      )
+                        template(v-slot:selection)
+                          .grey--text + 面接官を追加
+                        template(v-slot:item="{ item }")
+                          v-avatar.me-1(
+                            color="grey"
+                            size="18"
+                          )
+                            span.white--text.subtitle-2 {{ item.nickname[0] }}
+                          span.subtitle-2 {{ item.nickname }}
 </template>
 
 <script>
@@ -346,6 +368,9 @@ export default {
         positionId: true,
         result: true,
       },
+      newEvaluation: {
+        recruiterId: null,
+      },
     }
   },
   methods: {
@@ -382,6 +407,21 @@ export default {
       )
       RecruitmentHistory.update({ data })
       currentHistory[`${field}Editing`] = false
+    },
+    async createEvaluation(historyId, recruiterId) {
+      const { data } = await this.$axios.post(
+        `/recruitment_histories/${historyId}/recruitment_evaluations`,
+        { evaluation: { recruiter_id: recruiterId } }
+      )
+      RecruitmentHistory.insert({ data, insert: ['recruitmentEvaluation'] })
+      this.newEvaluation.recruiterId = null
+      this.$nextTick(function () {
+        this.$refs[`newEvaluation${historyId}`][0].blur()
+      })
+
+      // 表示中のカードの情報を洗い変える
+      const card = Candidate.query().withAllRecursive().find(data.candidateId)
+      this.currentCard = card
     },
     async updateEvaluation(currentEvaluation, field) {
       // 更新したフィールドのみ更新を走らせる
