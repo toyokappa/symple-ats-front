@@ -32,6 +32,7 @@
   v-dialog(
     v-model="scheduleDialog"
     max-width="800"
+    @click:outside="resetEventField()"
   )
     v-card
       v-container
@@ -150,7 +151,12 @@ export default {
         tms.minute
       ).getTime()
     },
-    createEvent() {
+    async createEvent() {
+      const confirmOK = await confirm(
+        '予定を確定します。入力した内容に間違いはありませんか？'
+      )
+      if (!confirmOK) return
+
       const { startTime, companyName, firstName, lastName, email } =
         this.eventField
       const summary = `${companyName} ${lastName} ${firstName}`
@@ -162,8 +168,19 @@ export default {
         email: email,
       }
       this.$axios.put(`/schedules/${this.$route.params.token}`, { event })
+
+      this.scheduleDialog = false
+      this.resetEventField()
     },
-    // TODO: フィールドを閉じた時に情報がリセットされるメソッドを追加
+    resetEventField() {
+      this.eventField = {
+        startTime: null,
+        companyName: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+      }
+    },
   },
 }
 </script>
