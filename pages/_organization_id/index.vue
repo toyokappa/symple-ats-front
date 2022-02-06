@@ -218,6 +218,79 @@
                           no-title
                           @input="updateHistory(history, 'selectedAt')"
                         )
+                v-divider
+                .white
+                  v-container
+                    v-card.mb-3
+                      v-container.pa-5
+                        v-row(dense)
+                          v-col.py-2.grey--text(cols="2") 面接官
+                          v-col.py-0(cols="10")
+                            v-autocomplete.body-2(
+                              append-icon=""
+                              :items="recruiterList"
+                              item-text="nickname"
+                              item-value="id"
+                              flat
+                              solo
+                              dense
+                              hide-details="auto"
+                            )
+                              template(v-slot:selection="{ item }")
+                                v-avatar.me-1(
+                                  color="grey"
+                                  size="18"
+                                )
+                                  span.white--text.subtitle-2 {{ item.nickname[0] }}
+                                span.subtitle-2 {{ item.nickname }}
+                              template(v-slot:item="{ item }")
+                                v-avatar.me-1(
+                                  color="grey"
+                                  size="18"
+                                )
+                                  span.white--text.subtitle-2 {{ item.nickname[0] }}
+                                span.subtitle-2 {{ item.nickname }}
+                        v-row(dense)
+                          v-col.py-2.grey--text(cols="2") 結果
+                          v-col.py-0(cols="10")
+                            v-autocomplete.body-2.grey--text(
+                              append-icon=""
+                              :items="resultList"
+                              item-text="ja"
+                              item-value="en"
+                              placeholder="未入力"
+                              flat
+                              solo
+                              dense
+                              hide-details="auto"
+                            )
+                        v-row(dense)
+                          v-col.py-2.grey--text(cols="2") 入力日
+                          v-col.py-0(cols="10")
+                            v-menu(
+                              :close-on-content-click="false"
+                              offset-y
+                            )
+                              template(v-slot:activator="{ on, attrs }")
+                                v-text-field.body-2(
+                                  placeholder="未入力"
+                                  hide-details="auto"
+                                  flat
+                                  solo
+                                  dense
+                                  readonly
+                                  v-bind="attrs"
+                                  v-on="on"
+                                )
+                              v-date-picker(
+                                no-title
+                              )
+                        .mt-3 ああああああああああああああああああああああああああああああ
+                    v-card(
+                      outlined
+                      link
+                    )
+                      v-card-text + 面接官を追加
 </template>
 
 <script>
