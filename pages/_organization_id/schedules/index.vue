@@ -44,12 +44,15 @@
                 v-btn(
                   block
                   outlined
-                ) {{ time }}
+                  :color="time.value === eventField.startTime ? 'primary' : ''"
+                  @click="eventField.startTime=time.value"
+                ) {{ time.text }}
             v-divider(vertical)
             v-col(cols="8")
               .mb-3
                 .grey--text.mb-1 会社名
                 v-text-field.body-2(
+                  v-model="eventField.companyName"
                   placeholder="学生は学校名を入力してください"
                   dense
                   outlined
@@ -60,6 +63,7 @@
                 v-row(dense)
                   v-col(cols="6")
                     v-text-field.body-2(
+                      v-model="eventField.lastName"
                       placeholder="姓"
                       dense
                       outlined
@@ -67,6 +71,7 @@
                     )
                   v-col(cols="6")
                     v-text-field.body-2(
+                      v-model="eventField.firstName"
                       placeholder="名"
                       dense
                       outlined
@@ -75,6 +80,7 @@
               .mb-3
                 .grey--text.mb-1 メールアドレス
                 v-text-field.body-2(
+                  v-model="eventField.email"
                   type="email"
                   suffix="注: 間違えると通知を受け取れません"
                   dense
@@ -84,6 +90,7 @@
               .mt-5.text-right
                 v-btn(
                   color="primary"
+                  @click="createEvent"
                 ) 日程を確定する
 </template>
 
@@ -109,6 +116,13 @@ export default {
       value: '',
       vacantTimes: [],
       scheduleDialog: false,
+      eventField: {
+        startTime: null,
+        companyName: '',
+        firstName: '',
+        lastName: '',
+        email: '',
+      },
     }
   },
   methods: {
@@ -120,7 +134,10 @@ export default {
         .fill()
         .map((_, i) => {
           let unixtime = start + 1800 * 1000 * i
-          return this.$dateFns.format(new Date(unixtime), 'H:mm開始')
+          return {
+            value: unixtime,
+            text: this.$dateFns.format(new Date(unixtime), 'H:mm開始'),
+          }
         })
       this.scheduleDialog = true
     },
@@ -133,6 +150,22 @@ export default {
         tms.minute
       ).getTime()
     },
+    createEvent() {
+      const { startTime, companyName, firstName, lastName, email } =
+        this.eventField
+      const summary = `${companyName} ${lastName} ${firstName}`
+      const endTime = startTime + 60 * 60 * 1000
+      const params = {
+        summary,
+        start: new Date(startTime),
+        end: new Date(endTime),
+        email: email,
+      }
+      this.$axios.post(`/schedules`, {
+        event: params,
+      })
+    },
+    // TODO: フィールドを閉じた時に情報がリセットされるメソッドを追加
   },
 }
 </script>
