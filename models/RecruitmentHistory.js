@@ -1,4 +1,5 @@
 import { Model } from '@vuex-orm/core'
+import RecruitmentEvaluation from './RecruitmentEvaluation'
 import RecruitmentSelection from './RecruitmentSelection'
 
 export default class RecruitmentHistory extends Model {
@@ -12,6 +13,10 @@ export default class RecruitmentHistory extends Model {
       result: this.attr(null),
       recruitmentSelectionId: this.number(null),
       candidateId: this.number(null),
+      recruitmentEvaluations: this.hasMany(
+        RecruitmentEvaluation,
+        'recruitmentHistoryId'
+      ),
       recruitmentSelection: this.belongsTo(
         RecruitmentSelection,
         'recruitmentSelectionId'

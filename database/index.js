@@ -4,6 +4,7 @@ import Channel from '../models/Channel'
 import Position from '../models/Position'
 import Recruiter from '../models/Recruiter'
 import RecruiterInvitation from '../models/RecruiterInvitation'
+import RecruitmentEvaluation from '../models/RecruitmentEvaluation'
 import RecruitmentHistory from '../models/RecruitmentHistory'
 import RecruitmentProject from '../models/RecruitmentProject'
 import RecruitmentSelection from '../models/RecruitmentSelection'
@@ -18,5 +19,6 @@ database.register(RecruiterInvitation)
 database.register(Channel)
 database.register(Position)
 database.register(RecruitmentHistory)
+database.register(RecruitmentEvaluation)
 
 export default database

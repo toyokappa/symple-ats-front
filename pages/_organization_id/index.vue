@@ -221,20 +221,27 @@
                 v-divider
                 .white
                   v-container
-                    v-card.mb-3
+                    v-card.mb-3(
+                      v-for="evaluation in history.recruitmentEvaluations"
+                      :key="evaluation.id"
+                    )
                       v-container.pa-5
                         v-row(dense)
                           v-col.py-2.grey--text(cols="2") 面接官
                           v-col.py-0(cols="10")
                             v-autocomplete.body-2(
+                              v-model="evaluation.recruiterId"
                               append-icon=""
                               :items="recruiterList"
                               item-text="nickname"
                               item-value="id"
-                              flat
+                              :flat="!evaluation.recruiterIdEditing"
                               solo
                               dense
                               hide-details="auto"
+                              @focus="evaluation.recruiterIdEditing = true"
+                              @blur="evaluation.recruiterIdEditing = false"
+                              @input="updateEvaluation(evaluation, 'recruiterId')"
                             )
                               template(v-slot:selection="{ item }")
                                 v-avatar.me-1(
@@ -254,28 +261,35 @@
                           v-col.py-2.grey--text(cols="2") 結果
                           v-col.py-0(cols="10")
                             v-autocomplete.body-2.grey--text(
+                              v-model="evaluation.result"
                               append-icon=""
                               :items="resultList"
                               item-text="ja"
                               item-value="en"
                               placeholder="未入力"
-                              flat
+                              :flat="!evaluation.resultEditing"
                               solo
                               dense
                               hide-details="auto"
+                              @focus="evaluation.resultEditing = true"
+                              @blur="evaluation.resultEditing = false"
+                              @input="updateEvaluation(evaluation, 'result')"
                             )
                         v-row(dense)
                           v-col.py-2.grey--text(cols="2") 入力日
                           v-col.py-0(cols="10")
                             v-menu(
+                              v-model="evaluation.inputAtEditing"
                               :close-on-content-click="false"
                               offset-y
+                              min-width="auto"
                             )
                               template(v-slot:activator="{ on, attrs }")
                                 v-text-field.body-2(
+                                  :value="evaluation.inputAt ? $dateFns.format(evaluation.inputAtToDate, 'yyyy.MM.dd') : null"
                                   placeholder="未入力"
                                   hide-details="auto"
-                                  flat
+                                  :flat="!evaluation.inputAtEditing"
                                   solo
                                   dense
                                   readonly
@@ -283,9 +297,11 @@
                                   v-on="on"
                                 )
                               v-date-picker(
+                                v-model="evaluation.inputAt"
                                 no-title
+                                @input="updateEvaluation(evaluation, 'inputAt')"
                               )
-                        .mt-3 ああああああああああああああああああああああああああああああ
+                        .mt-3 {{ evaluation.description }}
                     v-card(
                       outlined
                       link
@@ -300,6 +316,7 @@ import Position from '@/models/Position'
 import Recruiter from '@/models/Recruiter'
 import RecruitmentHistory, { resultList } from '@/models/RecruitmentHistory'
 import RecruitmentSelection from '@/models/RecruitmentSelection'
+import RecruitmentEvaluation from '@/models/RecruitmentEvaluation'
 
 export default {
   layout: 'signedIn',
@@ -365,6 +382,21 @@ export default {
       )
       RecruitmentHistory.update({ data })
       currentHistory[`${field}Editing`] = false
+    },
+    async updateEvaluation(currentEvaluation, field) {
+      // 更新したフィールドのみ更新を走らせる
+      const fieldSnakeCase = field.replace(
+        /[A-Z]/g,
+        (s) => '_' + s[0].toLowerCase()
+      )
+      let evaluation = {}
+      evaluation[fieldSnakeCase] = currentEvaluation[field]
+      const { data } = await this.$axios.put(
+        `/recruitment_histories/${currentEvaluation.recruitmentHistoryId}/recruitment_evaluations/${currentEvaluation.id}`,
+        { evaluation }
+      )
+      RecruitmentEvaluation.update({ data })
+      currentEvaluation[`${field}Editing`] = false
     },
   },
   computed: {
