@@ -40,7 +40,7 @@
           v-row
             v-col(cols="4")
               .grey--text.mb-1 開始時間の選択
-              .mb-3(v-for="time in vacantTimes" :key="time")
+              .mb-3(v-for="time in vacantTimes" :key="time.value")
                 v-btn(
                   block
                   outlined
@@ -96,9 +96,9 @@
 
 <script>
 export default {
-  async asyncData({ $axios }) {
-    const { data } = await $axios.get('/schedules')
-    const events = data.schedules.map((schedule) => {
+  async asyncData({ $axios, params }) {
+    const { data } = await $axios.get(`/schedules/${params.token}`)
+    const events = data.map((schedule) => {
       return {
         name: '調整可能',
         start: new Date(schedule.start),
@@ -155,15 +155,13 @@ export default {
         this.eventField
       const summary = `${companyName} ${lastName} ${firstName}`
       const endTime = startTime + 60 * 60 * 1000
-      const params = {
+      const event = {
         summary,
         start: new Date(startTime),
         end: new Date(endTime),
         email: email,
       }
-      this.$axios.post(`/schedules`, {
-        event: params,
-      })
+      this.$axios.put(`/schedules/${this.$route.params.token}`, { event })
     },
     // TODO: フィールドを閉じた時に情報がリセットされるメソッドを追加
   },
