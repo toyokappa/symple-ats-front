@@ -167,12 +167,11 @@
                 .grey.lighten-3.px-3.py-2.cursor-pointer
                   v-row(
                     align="center"
+                    dense
                   )
-                    v-col(
-                      cols="5"
-                    )
+                    v-col(cols="3")
                       .d-flex.align-center
-                        .text-body-2.font-weight-bold.me-2 {{ history.recruitmentSelection.name }}
+                        .text-body-2.text-no-wrap.font-weight-bold.me-2 {{ history.recruitmentSelection.name }}
                         v-autocomplete.body-2.grey--text(
                           v-if="['document', 'interview'].includes(history.recruitmentSelection.selectionType)"
                           v-model="history.result"
@@ -180,7 +179,7 @@
                           :items="resultList"
                           item-text="ja"
                           item-value="en"
-                          placeholder="未入力"
+                          placeholder="結果未入力"
                           :background-color="history.resultEditing ? 'inherit' : 'transparent'"
                           :flat="!history.resultEditing"
                           solo
@@ -191,10 +190,26 @@
                           @blur="history.resultEditing = false"
                           @input="updateHistory(history, 'result')"
                         )
-                    v-col(
-                      offset="4"
-                      cols="3"
-                    )
+                    v-col(cols="7")
+                      template(v-if="['interview'].includes(history.recruitmentSelection.selectionType)")
+                        v-btn(
+                          v-if="!history.autoSchedulingToken"
+                          block
+                          outlined
+                          dense
+                          @click="createAutoSchedulingToken(history.id)"
+                        ) 日程の自動調整を行う
+                        v-text-field.caption(
+                          v-else
+                          :value="history.autoSchedulingUrl($route.params.organization_id)"
+                          readonly
+                          append-icon="mdi-content-copy"
+                          outlined
+                          dense
+                          hide-details="auto"
+                          @click="copyUrl"
+                        )
+                    v-col(cols="2")
                       v-menu(
                         v-model="history.selectedAtEditing"
                         :close-on-content-click="false"
@@ -203,7 +218,7 @@
                         template(v-slot:activator="{ on, attrs }")
                           v-text-field.body-2.selected-at(
                             :value="history.selectedAt ? $dateFns.format(history.selectedAtToDate, 'yyyy.MM.dd') : null"
-                            placeholder="未入力"
+                            placeholder="日程未入力"
                             hide-details="auto"
                             :background-color="history.selectedAtEditing ? 'inherit' : 'transparent'"
                             :flat="!history.selectedAtEditing"
@@ -377,6 +392,15 @@ export default {
     openDialog(card) {
       this.currentCard = card
       this.dialog = true
+    },
+    async createAutoSchedulingToken(historyId) {
+      const { data } = await this.$axios.post(
+        `/recruitment_histories/${historyId}/auto_scheduling_token`
+      )
+      RecruitmentHistory.update({ data })
+    },
+    copyUrl(e) {
+      navigator.clipboard.writeText(e.target.value)
     },
     async update(field) {
       // 更新したフィールドのみ更新を走らせる

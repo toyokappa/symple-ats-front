@@ -11,6 +11,7 @@ export default class RecruitmentHistory extends Model {
       id: this.number(null),
       selectedAt: this.attr(null),
       result: this.attr(null),
+      autoSchedulingToken: this.attr(null),
       recruitmentSelectionId: this.number(null),
       candidateId: this.number(null),
       recruitmentEvaluations: this.hasMany(
@@ -28,6 +29,10 @@ export default class RecruitmentHistory extends Model {
 
   get selectedAtToDate() {
     return this.selectedAt ? new Date(this.selectedAt) : null
+  }
+
+  autoSchedulingUrl(orgId) {
+    return `http://localhost:3000/${orgId}/schedules/${this.autoSchedulingToken}`
   }
 }
 
