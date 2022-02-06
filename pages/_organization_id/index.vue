@@ -398,9 +398,14 @@ export default {
         `/recruitment_histories/${historyId}/auto_scheduling_token`
       )
       RecruitmentHistory.update({ data })
+
+      // 表示中のカードの情報を洗い変える
+      const card = Candidate.query().withAllRecursive().find(data.candidateId)
+      this.currentCard = card
     },
     copyUrl(e) {
       navigator.clipboard.writeText(e.target.value)
+      // コピーした旨の表示が出るように修正
     },
     async update(field) {
       // 更新したフィールドのみ更新を走らせる
