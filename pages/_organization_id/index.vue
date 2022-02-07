@@ -194,6 +194,7 @@
                       template(v-if="['interview'].includes(history.recruitmentSelection.selectionType)")
                         v-btn(
                           v-if="!history.autoSchedulingToken"
+                          :disabled="!history.recruitersAllGoogleAuthenticated"
                           block
                           outlined
                           dense
@@ -201,13 +202,12 @@
                         ) 日程の自動調整を行う
                         v-text-field.caption(
                           v-else
-                          :value="history.autoSchedulingUrl($route.params.organization_id)"
+                          :value="history.autoSchedulingUrl(orgId)"
                           readonly
-                          append-icon="mdi-content-copy"
                           outlined
                           dense
                           hide-details="auto"
-                          @click="copyUrl"
+                          @click="copyUrl(history.autoSchedulingUrl(orgId))"
                         )
                     v-col(cols="2")
                       v-menu(
@@ -236,8 +236,9 @@
                 v-divider
                 .white
                   v-container
-                    v-card.mb-3(
-                      v-for="evaluation in history.recruitmentEvaluations"
+                    v-card(
+                      v-for="(evaluation, index) in history.recruitmentEvaluations"
+                      :class="{ 'mt-3': (index > 0) }"
                       :key="evaluation.id"
                     )
                       v-container.pa-5
@@ -317,7 +318,8 @@
                                 @input="updateEvaluation(evaluation, 'inputAt')"
                               )
                         .mt-3 {{ evaluation.description }}
-                    v-card(
+                    v-card.mt-3(
+                      v-if="(!history.result || !history.selectedAt) && !history.autoSchedulingToken"
                       outlined
                       link
                     )
@@ -398,13 +400,10 @@ export default {
         `/recruitment_histories/${historyId}/auto_scheduling_token`
       )
       RecruitmentHistory.update({ data })
-
-      // 表示中のカードの情報を洗い変える
-      const card = Candidate.query().withAllRecursive().find(data.candidateId)
-      this.currentCard = card
+      this.refreshCurrentCard()
     },
-    copyUrl(e) {
-      navigator.clipboard.writeText(e.target.value)
+    copyUrl(url) {
+      navigator.clipboard.writeText(url)
       // コピーした旨の表示が出るように修正
     },
     async update(field) {
@@ -436,6 +435,7 @@ export default {
       )
       RecruitmentHistory.update({ data })
       currentHistory[`${field}Editing`] = false
+      this.refreshCurrentCard()
     },
     async createEvaluation(historyId, recruiterId) {
       const { data } = await this.$axios.post(
@@ -447,10 +447,7 @@ export default {
       this.$nextTick(function () {
         this.$refs[`newEvaluation${historyId}`][0].blur()
       })
-
-      // 表示中のカードの情報を洗い変える
-      const card = Candidate.query().withAllRecursive().find(data.candidateId)
-      this.currentCard = card
+      this.refreshCurrentCard()
     },
     async updateEvaluation(currentEvaluation, field) {
       // 更新したフィールドのみ更新を走らせる
@@ -466,9 +463,20 @@ export default {
       )
       RecruitmentEvaluation.update({ data })
       currentEvaluation[`${field}Editing`] = false
+      this.refreshCurrentCard()
+    },
+    refreshCurrentCard() {
+      // 表示中のカードの情報を洗い変える
+      const card = Candidate.query()
+        .withAllRecursive()
+        .find(this.currentCard.id)
+      this.currentCard = card
     },
   },
   computed: {
+    orgId() {
+      return this.$route.params.organization_id
+    },
     selectionList() {
       return RecruitmentSelection.query().withAllRecursive().all()
     },

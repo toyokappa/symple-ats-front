@@ -1,4 +1,5 @@
 import { Model } from '@vuex-orm/core'
+import Recruiter from './Recruiter'
 
 export default class RecruitmentEvaluation extends Model {
   static entity = 'recruitmentEvaluations'
@@ -15,6 +16,7 @@ export default class RecruitmentEvaluation extends Model {
       recruiterIdEditing: this.boolean(false),
       resultEditing: this.boolean(false),
       inputAtEditing: this.boolean(false),
+      recruiter: this.belongsTo(Recruiter, 'recruiterId'),
     }
   }
 

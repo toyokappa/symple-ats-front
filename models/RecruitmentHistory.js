@@ -31,6 +31,14 @@ export default class RecruitmentHistory extends Model {
     return this.selectedAt ? new Date(this.selectedAt) : null
   }
 
+  get recruitersAllGoogleAuthenticated() {
+    if (this.recruitmentEvaluations.length === 0) return false
+
+    return this.recruitmentEvaluations.every(
+      (evaluation) => evaluation.recruiter.googleAuthenticated
+    )
+  }
+
   autoSchedulingUrl(orgId) {
     return `http://localhost:3000/${orgId}/schedules/${this.autoSchedulingToken}`
   }
