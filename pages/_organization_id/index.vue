@@ -23,15 +23,9 @@
               @blur="update('name')"
             )
             v-container
-              v-row(
-                dense
-              )
-                v-col.py-2.grey--text(
-                  cols="2"
-                ) 選考状況
-                v-col.py-0(
-                  cols="10"
-                )
+              v-row(dense)
+                v-col.py-2.grey--text(cols="2") 選考状況
+                v-col.py-0(cols="10")
                   v-autocomplete.body-2(
                     v-model="currentCard.recruitmentSelectionId"
                     append-icon=""
@@ -55,15 +49,9 @@
                         small
                         label
                        ) {{ item.name }}
-              v-row(
-                dense
-              )
-                v-col.py-2.grey--text(
-                  cols="2"
-                ) 採用担当
-                v-col.py-0(
-                  cols="10"
-                )
+              v-row(dense)
+                v-col.py-2.grey--text(cols="2") 採用担当
+                v-col.py-0(cols="10")
                   v-autocomplete.body-2(
                     v-model="currentCard.recruiterId"
                     append-icon=""
@@ -91,15 +79,9 @@
                       )
                         span.white--text.subtitle-2 {{ item.nickname[0] }}
                       span.subtitle-2 {{ item.nickname }}
-              v-row(
-                dense
-              )
-                v-col.py-2.grey--text(
-                  cols="2"
-                ) 応募経路
-                v-col.py-0(
-                  cols="10"
-                )
+              v-row(dense)
+                v-col.py-2.grey--text(cols="2") 応募経路
+                v-col.py-0(cols="10")
                   v-autocomplete.body-2(
                     v-model="currentCard.channelId"
                     append-icon=""
@@ -127,15 +109,9 @@
                         label
                       )
                         .white--text.font-weight-bold {{ item.name }}
-              v-row(
-                dense
-              )
-                v-col.py-2.grey--text(
-                  cols="2"
-                ) ポジション
-                v-col.py-0(
-                  cols="10"
-                )
+              v-row(dense)
+                v-col.py-2.grey--text(cols="2") ポジション
+                v-col.py-0(cols="10")
                   v-autocomplete.body-2(
                     v-model="currentCard.positionId"
                     append-icon=""
@@ -159,6 +135,59 @@
                         small
                         label
                       ) {{ item.internalName }}
+              v-row(dense)
+                v-col.py-2.grey--text(cols="2") レジュメ
+                v-col.py-0(cols="10")
+                  input.d-none(
+                    type="file"
+                    multiple
+                    ref="resumeInput"
+                    @change="uploadResumes"
+                  )
+                  v-menu(
+                    offset-y
+                    tile
+                    :close-on-content-click="false"
+                  )
+                    template(v-slot:activator="{ on, attrs }")
+                      v-list-item.body-2(
+                        placeholder="未登録"
+                        dense
+                        v-bind="attrs"
+                        v-on="on"
+                      )
+                        template(v-if="currentCard.resumeFiles.length > 0")
+                          v-chip.me-2(
+                            v-for="file in currentCard.resumeFiles"
+                            :key="file.url"
+                            label
+                            small
+                          ) {{ file.name }}
+                        template(v-else)
+                          v-list-item-content
+                            v-list-item-title.grey--text 未登録
+                    v-list.py-0(dense)
+                      template(v-if="currentCard.resumeFiles.length > 0")
+                        .py-2
+                          v-list-item(
+                            v-for="file in currentCard.resumeFiles"
+                            :key="file.url"
+                          )
+                            v-chip(
+                              label
+                              close
+                              link
+                              :href="file.url"
+                              target="_blank"
+                              @click:close="deleteResume(file.id)"
+                            ) {{ file.name }}
+                        v-divider
+                      v-list-item(
+                        link
+                        @click="$refs.resumeInput.click()"
+                      )
+                        v-list-item-content
+                          v-list-item-title + ファイルを追加する
             v-container
               v-card.mb-3(
                 v-for="history in currentCard.recruitmentHistories" :key="history.id"
@@ -420,6 +449,27 @@ export default {
       )
       Candidate.update({ data })
       this.flat[field] = true
+    },
+    async uploadResumes(e) {
+      const files = e.target.files || e.dataTransfer.files
+      let params = new FormData()
+      Array.from(files).forEach((file) => {
+        params.append(`resume[files][]`, file)
+      })
+      const { data } = await this.$axios.post(
+        `/candidates/${this.currentCard.id}/resumes`,
+        params,
+        { 'Content-Type': 'multipart/form-data' }
+      )
+      Candidate.update({ data })
+      this.refreshCurrentCard()
+    },
+    async deleteResume(id) {
+      const { data } = await this.$axios.delete(
+        `/candidates/${this.currentCard.id}/resumes/${id}`
+      )
+      Candidate.update({ data })
+      this.refreshCurrentCard()
     },
     async updateHistory(currentHistory, field) {
       // 更新したフィールドのみ更新を走らせる
