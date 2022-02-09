@@ -25,6 +25,9 @@ v-card.pt-8.pb-16.mx-auto(
           )
       .grey--text.mb-1 応募ポジション
       v-autocomplete.body-2.mb-3(
+        :items="positionList"
+        item-text="externalName"
+        item-value="id"
         dense
         outlined
         hide-details="auto"
@@ -52,7 +55,7 @@ v-card.pt-8.pb-16.mx-auto(
       .caption.grey--text.mb-3 入力いただいた内容は一定期間保存されます。
       .grey--text.mb-1 紹介者の所属
       v-text-field.body-2.mb-1(
-        value="JACリクルートメント"
+        :value="channel.name"
         dense
         outlined
         readonly
@@ -90,5 +93,26 @@ v-card.pt-8.pb-16.mx-auto(
 </template>
 
 <script>
-export default {}
+import Position from '@/models/Position'
+import Channel from '@/models/Channel'
+
+export default {
+  async fetch({ params, $axios }) {
+    const orgId = params.organization_id
+    const { data: positionList } = await $axios.get(`/${orgId}/positions`)
+    const { data: channel } = await $axios.get(
+      `/${orgId}/applies/${params.token}`
+    )
+    Position.insertOrUpdate({ data: positionList })
+    Channel.insertOrUpdate({ data: channel })
+  },
+  computed: {
+    positionList() {
+      return Position.all()
+    },
+    channel() {
+      return Channel.query().first()
+    },
+  },
+}
 </script>

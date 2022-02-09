@@ -29,7 +29,7 @@ export default class Channel extends Model {
 
   get applyUrl() {
     return !!this.applyToken && this.category === 'agent'
-      ? `http://localhost:3000/${this.organizationUniqueId}/apply/${this.applyToken}`
+      ? `http://localhost:3000/${this.organizationUniqueId}/applies/${this.applyToken}`
       : '-'
   }
 }
