@@ -11,6 +11,7 @@ export default class Channel extends Model {
       category: this.string(''),
       automation: this.string(''),
       applyToken: this.attr(null),
+      organizationUniqueId: this.attr(''),
     }
   }
 
@@ -27,8 +28,8 @@ export default class Channel extends Model {
   }
 
   get applyUrl() {
-    return !!this.applyToken
-      ? `https://apply.symple.com/${this.applyToken}`
+    return !!this.applyToken && this.category === 'agent'
+      ? `http://localhost:3000/${this.organizationUniqueId}/apply/${this.applyToken}`
       : '-'
   }
 }
