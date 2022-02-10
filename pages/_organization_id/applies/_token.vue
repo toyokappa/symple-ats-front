@@ -11,6 +11,7 @@ v-card.pt-8.pb-16.mx-auto(
       v-row(dense).mb-3
         v-col(cols="6")
           v-text-field.body-2(
+            v-model="applyForm.candidateLastName"
             dense
             outlined
             hide-details="auto"
@@ -18,6 +19,7 @@ v-card.pt-8.pb-16.mx-auto(
           )
         v-col(cols="6")
           v-text-field.body-2(
+            v-model="applyForm.candidateFirstName"
             dense
             outlined
             hide-details="auto"
@@ -25,6 +27,7 @@ v-card.pt-8.pb-16.mx-auto(
           )
       .grey--text.mb-1 応募ポジション
       v-autocomplete.body-2.mb-3(
+        v-model="applyForm.positionId"
         :items="positionList"
         item-text="externalName"
         item-value="id"
@@ -35,6 +38,7 @@ v-card.pt-8.pb-16.mx-auto(
       )
       .grey--text.mb-1 レジュメ
       v-file-input.body-2.mb-3(
+        v-model="applyForm.resumes"
         dense
         outlined
         multiple
@@ -45,6 +49,7 @@ v-card.pt-8.pb-16.mx-auto(
       )
       .grey--text.mb-1 推薦文
       v-textarea.body-2(
+        v-model="applyForm.description"
         dense
         outlined
         hide-details="auto"
@@ -66,6 +71,7 @@ v-card.pt-8.pb-16.mx-auto(
       v-row(dense).mb-3
         v-col(cols="6")
           v-text-field.body-2(
+            v-model="applyForm.agentLastName"
             dense
             outlined
             hide-details="auto"
@@ -73,6 +79,7 @@ v-card.pt-8.pb-16.mx-auto(
           )
         v-col(cols="6")
           v-text-field.body-2(
+            v-model="applyForm.agentFirstName"
             dense
             outlined
             hide-details="auto"
@@ -80,6 +87,7 @@ v-card.pt-8.pb-16.mx-auto(
           )
       .grey--text.mb-1 紹介者のメールアドレス
       v-text-field.body-2.mb-5(
+        v-model="applyForm.agentEmail"
         type="email"
         dense
         outlined
@@ -89,6 +97,7 @@ v-card.pt-8.pb-16.mx-auto(
         block
         color="primary"
         dense
+        @click="apply"
       ) 候補者を推薦する
 </template>
 
@@ -106,12 +115,76 @@ export default {
     Position.insertOrUpdate({ data: positionList })
     Channel.insertOrUpdate({ data: channel })
   },
+  data() {
+    return {
+      applyForm: {
+        candidateFirstName: '',
+        candidateLastName: '',
+        positionId: null,
+        resumes: null,
+        description: '',
+        agentFirstName: '',
+        agentLastName: '',
+        agentEmail: '',
+      },
+    }
+  },
+  methods: {
+    async apply() {
+      const orgId = this.$route.params.organization_id
+      this.$axios.post(`/${orgId}/applies`, this.applyParams, {
+        'Content-Type': 'multipart/form-data',
+      })
+      localStorage.setItem('agentFirstName', this.applyForm.agentFirstName)
+      localStorage.setItem('agentLastName', this.applyForm.agentLastName)
+      localStorage.setItem('agentEmail', this.applyForm.agentEmail)
+      this.applyForm.candidateFirstName = ''
+      this.applyForm.candidateLastName = ''
+      this.applyForm.positionId = null
+      this.applyForm.resumes = null
+      this.applyForm.description = ''
+    },
+  },
+  mounted() {
+    this.applyForm.agentFirstName = localStorage.getItem('agentFirstName')
+    this.applyForm.agentLastName = localStorage.getItem('agentLastName')
+    this.applyForm.agentEmail = localStorage.getItem('agentEmail')
+  },
   computed: {
     positionList() {
       return Position.all()
     },
     channel() {
       return Channel.query().first()
+    },
+    applyParams() {
+      const params = new FormData()
+      const {
+        candidateFirstName,
+        candidateLastName,
+        positionId,
+        resumes,
+        description,
+        agentFirstName,
+        agentLastName,
+        agentEmail,
+      } = this.applyForm
+      params.append(
+        'candidate[name]',
+        `${candidateLastName} ${candidateFirstName}`
+      )
+      params.append('candidate[position_id]', positionId)
+      params.append('candidate[channel_id]', this.channel.id)
+      resumes.forEach((file) => {
+        params.append('candidate[resumes][]', file)
+      })
+      params.append(
+        'candidate[agent_name]',
+        `${agentLastName} ${agentFirstName}`
+      )
+      params.append('candidate[agent_email]', agentEmail)
+      params.append('candidate[description]', description)
+      return params
     },
   },
 }
