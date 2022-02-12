@@ -106,16 +106,35 @@
               v-model="valid.internalName"
               @submit.prevent
             )
-              v-text-field.text-h5.font-weight-bold.mb-2(
-                v-model="currentPosition.internalName"
-                :rules="internalNameRules"
-                flat
-                solo
-                dense
-                placeholder="未入力"
-                hide-details="auto"
-                @blur="update('internalName')"
-              )
+              .d-flex
+                v-text-field.text-h5.font-weight-bold.mb-2(
+                  v-model="currentPosition.internalName"
+                  :rules="internalNameRules"
+                  flat
+                  solo
+                  dense
+                  placeholder="未入力"
+                  hide-details="auto"
+                  @blur="update('internalName')"
+                )
+                v-menu(
+                  offset-y
+                  left
+                )
+                  template(v-slot:activator="{ on, attrs }")
+                    v-btn(
+                      icon
+                      tile
+                      v-bind="attrs"
+                      v-on="on"
+                    )
+                      v-icon mdi-dots-vertical
+                  v-list(dense)
+                    v-list-item(
+                      link
+                      @click="deletePosition()"
+                    )
+                      v-list-item-title ポジションを削除
             v-container
               v-row(
                 dense
@@ -262,6 +281,16 @@ export default {
     openUpdateDialog(position) {
       this.currentPosition = position
       this.updateDialog = true
+    },
+    async deletePosition() {
+      const isDelete = await confirm('本当に削除してよろしいですか？')
+      if (!isDelete) return
+
+      const { data } = await this.$axios.delete(
+        `/${this.orgId}/positions/${this.currentPosition.id}`
+      )
+      this.updateDialog = false
+      Position.delete(data.id)
     },
   },
   computed: {
