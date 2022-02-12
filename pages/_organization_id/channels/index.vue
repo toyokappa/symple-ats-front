@@ -116,16 +116,35 @@
               v-model="valid.name"
               @submit.prevent
             )
-              v-text-field.text-h5.font-weight-bold.mb-2(
-                v-model="currentChannel.name"
-                :rules="nameRules"
-                flat
-                solo
-                dense
-                placeholder="未入力"
-                hide-details="auto"
-                @blur="update('name')"
-              )
+              .d-flex
+                v-text-field.text-h5.font-weight-bold.mb-2(
+                  v-model="currentChannel.name"
+                  :rules="nameRules"
+                  flat
+                  solo
+                  dense
+                  placeholder="未入力"
+                  hide-details="auto"
+                  @blur="update('name')"
+                )
+                v-menu(
+                  offset-y
+                  left
+                )
+                  template(v-slot:activator="{ on, attrs }")
+                    v-btn(
+                      icon
+                      tile
+                      v-bind="attrs"
+                      v-on="on"
+                    )
+                      v-icon mdi-dots-vertical
+                  v-list(dense)
+                    v-list-item(
+                      link
+                      @click="deleteChannel()"
+                    )
+                      v-list-item-title チャネルを削除
             v-container
               v-row(
                 dense
@@ -285,6 +304,16 @@ export default {
       )
       Channel.update({ data })
       this.flat[field] = true
+    },
+    async deleteChannel() {
+      const isDelete = await confirm('本当に削除してよろしいですか？')
+      if (!isDelete) return
+
+      const { data } = await this.$axios.delete(
+        `/${this.orgId}/channels/${this.currentChannel.id}`
+      )
+      this.updateDialog = false
+      Channel.delete(data.id)
     },
     openUpdateDialog(channel) {
       this.currentChannel = channel
