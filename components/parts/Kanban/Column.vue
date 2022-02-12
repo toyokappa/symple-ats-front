@@ -17,7 +17,7 @@ draggable(
       .grey.lighten-3.px-3.py-2.d-flex.justify-start.cursor-pointer
         h3.text-body-2.font-weight-bold.me-2 {{ column.name }}
         .text-body-2.grey--text {{ column.candidates.length }}
-      .kanban-column.white.pa-3.overflow-y-scroll
+      .kanban-column.white.pa-3.overflow-auto
         parts-kanban-card(
           :cardList="column.candidates"
           :columnId="column.id"
