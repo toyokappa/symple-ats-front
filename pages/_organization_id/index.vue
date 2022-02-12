@@ -244,23 +244,41 @@
                         )
                     v-col(cols="7")
                       template(v-if="['interview'].includes(history.recruitmentSelection.selectionType)")
-                        v-btn(
-                          v-if="!history.autoSchedulingToken"
-                          :disabled="!history.recruitersAllGoogleAuthenticated"
-                          block
-                          outlined
-                          dense
-                          @click="createAutoSchedulingToken(history.id)"
-                        ) 日程の自動調整を行う
-                        v-text-field.caption(
-                          v-else
-                          :value="history.autoSchedulingUrl(orgId)"
-                          readonly
-                          outlined
-                          dense
-                          hide-details="auto"
-                          @click="copyUrl(history.autoSchedulingUrl(orgId))"
-                        )
+                        template(v-if="!history.autoSchedulingToken")
+                          template(v-if="history.recruitersAllGoogleAuthenticated")
+                            v-btn(
+                              block
+                              outlined
+                              dense
+                              @click="createAutoSchedulingToken(history.id)"
+                            ) 日程の自動調整を行う
+                          template(v-else)
+                            v-tooltip(
+                              :disabled="history.recruitersAllGoogleAuthenticated"
+                              bottom
+                            )
+                              template(v-slot:activator="{ on, attrs }")
+                                v-btn(
+                                  color="grey"
+                                  block
+                                  outlined
+                                  dense
+                                  :ripple="false"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                ) 日程の自動調整を行う
+                              span 自動調整を行うには選考官がGoogle連携済みである必要があります。
+                        template(v-else)
+                          v-text-field.caption(
+                            :value="history.autoSchedulingUrl(orgId)"
+                            readonly
+                            append-icon="mdi-close-circle"
+                            outlined
+                            dense
+                            hide-details="auto"
+                            @click="copyUrl(history.autoSchedulingUrl(orgId))"
+                            @click:append="deleteAutoSchedulingToken(history.id)"
+                          )
                     v-col(cols="2")
                       v-menu(
                         v-model="history.selectedAtEditing"
@@ -297,7 +315,7 @@
                         .d-flex
                           .flex-grow-1
                             v-row(dense)
-                              v-col.py-2.grey--text(cols="2") 面接官
+                              v-col.py-2.grey--text(cols="2") 選考官
                               v-col.py-0(cols="10")
                                 v-autocomplete.body-2(
                                   v-model="evaluation.recruiterId"
@@ -320,6 +338,18 @@
                                     )
                                       span.white--text.subtitle-2 {{ item.nickname[0] }}
                                     span.subtitle-2 {{ item.nickname }}
+                                    v-tooltip(
+                                      v-if="item.googleAuthenticated"
+                                      bottom
+                                    )
+                                      template(v-slot:activator="{ on, attrs }")
+                                        v-icon.ms-1(
+                                          color="success"
+                                          dense
+                                          v-bind="attrs"
+                                          v-on="on"
+                                        ) mdi-check-decagram
+                                      span.caption Google連携済み
                                   template(v-slot:item="{ item }")
                                     v-avatar.me-1(
                                       color="grey"
@@ -420,6 +450,14 @@
                           )
                             span.white--text.subtitle-2 {{ item.nickname[0] }}
                           span.subtitle-2 {{ item.nickname }}
+  v-snackbar(v-model="snackbar") クリップボードにコピーしました。
+    template(v-slot:action="{ attrs }")
+      v-btn(
+        color="red"
+        text
+        v-bind="attrs"
+        @click="snackbar = false"
+      ) 閉じる
 </template>
 
 <script>
@@ -450,6 +488,7 @@ export default {
   data() {
     return {
       dialog: false,
+      snackbar: false,
       currentCard: null,
       resultList,
       newEvaluation: {
@@ -469,9 +508,21 @@ export default {
       RecruitmentHistory.update({ data })
       this.refreshCurrentCard()
     },
+    async deleteAutoSchedulingToken(historyId) {
+      const isDelete = await confirm(
+        '自動スケジュール調整URLを削除してよろしいですか？'
+      )
+      if (!isDelete) return
+
+      const { data } = await this.$axios.delete(
+        `/recruitment_histories/${historyId}/auto_scheduling_token`
+      )
+      RecruitmentHistory.update({ data })
+      this.refreshCurrentCard()
+    },
     copyUrl(url) {
       navigator.clipboard.writeText(url)
-      // コピーした旨の表示が出るように修正
+      this.snackbar = true
     },
     async update(field) {
       // 更新したフィールドのみ更新を走らせる
