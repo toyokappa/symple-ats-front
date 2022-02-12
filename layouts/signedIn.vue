@@ -114,7 +114,7 @@ v-app
           .caption.grey--text.mb-3 Googleカレンダーと連携することにより、面接日程の自動設定機能を利用することができます。なお、複数人が出席する面接の自動設定を行う場合は、出席する面接官全員がGoogleカレンダーと連携している必要があります。
           template(v-if="currentRecruiter.googleAuthenticated")
             .d-flex.align-center.mb-3
-              v-icon.green--text.me-1 mdi-check-bold
+              v-icon.green--text.me-1 mdi-check-decagram
               .body-1.green--text.pt-1.me-3 Googleカレンダーと連携済み
               v-btn(
                 outlined
@@ -122,7 +122,7 @@ v-app
                 link
                 href="http://localhost:7700/auth/google_oauth2"
               )
-                v-icon(dense) mdi-google
+                v-icon(small) mdi-google
                 span.ms-1 再連携する
             .d-flex.align-center
               .grey--text.me-3 連携中アカウント:
