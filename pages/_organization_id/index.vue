@@ -12,16 +12,35 @@
       v-card
         v-container
           v-card-text
-            v-text-field.text-h5.font-weight-bold.mb-2(
-              v-model="currentCard.name"
-              flat
-              solo
-              dense
-              autofocus
-              placeholder="名前未入力"
-              hide-details="auto"
-              @blur="update('name')"
-            )
+            .d-flex
+              v-text-field.text-h5.font-weight-bold.mb-2(
+                v-model="currentCard.name"
+                flat
+                solo
+                dense
+                autofocus
+                placeholder="名前未入力"
+                hide-details="auto"
+                @blur="update('name')"
+              )
+              v-menu(
+                offset-y
+                left
+              )
+                template(v-slot:activator="{ on, attrs }")
+                  v-btn(
+                    icon
+                    tile
+                    v-bind="attrs"
+                    v-on="on"
+                  )
+                    v-icon mdi-dots-vertical
+                v-list(dense)
+                  v-list-item(
+                    link
+                    @click="deleteCandidate"
+                  )
+                    v-list-item-title 候補者を削除
             v-container
               v-row(dense)
                 v-col.py-2.grey--text(cols="2") 選考状況
@@ -449,6 +468,16 @@ export default {
       )
       Candidate.update({ data })
       this.flat[field] = true
+    },
+    async deleteCandidate() {
+      const isDelete = await confirm('本当に削除してよろしいですか？')
+      if (!isDelete) return
+
+      const { data } = await this.$axios.delete(
+        `/candidates/${this.currentCard.id}`
+      )
+      this.dialog = false
+      Candidate.delete(data.id)
     },
     async uploadResumes(e) {
       const files = e.target.files || e.dataTransfer.files
