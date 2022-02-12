@@ -22,6 +22,11 @@ export default class Candidate extends Model {
       channel: this.belongsTo(Channel, 'channelId'),
       position: this.belongsTo(Position, 'positionId'),
       recruitmentHistories: this.hasMany(RecruitmentHistory, 'candidateId'),
+      nameEditing: this.boolean(false),
+      recruitmentSelectionIdEditing: this.boolean(false),
+      recruiterIdEditing: this.boolean(false),
+      channelIdEditing: this.boolean(false),
+      positionIdEditing: this.boolean(false),
     }
   }
 }

@@ -51,12 +51,13 @@
                     :items="selectionList"
                     item-text="name"
                     item-value="id"
-                    :flat="flat.recruitmentSelectionId"
+                    :flat="!currentCard.recruitmentSelectionIdEditing"
                     solo
                     dense
                     hide-details="auto"
-                    @focus="flat.recruitmentSelectionId = false"
-                    @blur="update('recruitmentSelectionId')"
+                    @focus="currentCard.recruitmentSelectionIdEditing = true"
+                    @blur="currentCard.recruitmentSelectionIdEditing = false"
+                    @input="update('recruitmentSelectionId')"
                   )
                     template(v-slot:selection="{ item }")
                       v-chip(
@@ -77,12 +78,13 @@
                     :items="recruiterList"
                     item-text="nickname"
                     item-value="id"
-                    :flat="flat.recruiterId"
+                    :flat="!currentCard.recruiterIdEditing"
                     solo
                     dense
                     hide-details="auto"
-                    @focus="flat.recruiterId = false"
-                    @blur="update('recruiterId')"
+                    @focus="currentCard.recruiterIdEditing = true"
+                    @blur="currentCard.recruiterIdEditing = false"
+                    @input="update('recruiterId')"
                   )
                     template(v-slot:selection="{ item }")
                       v-avatar.me-1(
@@ -107,12 +109,13 @@
                     :items="channelList"
                     item-text="name"
                     item-value="id"
-                    :flat="flat.channelId"
+                    :flat="!currentCard.channelIdEditing"
                     solo
                     dense
                     hide-details="auto"
-                    @focus="flat.channelId = false"
-                    @blur="update('channelId')"
+                    @focus="currentCard.channelIdEditing = true"
+                    @blur="currentCard.channelIdEditing = false"
+                    @input="update('channelId')"
                   )
                     template(v-slot:selection="{ item }")
                       v-chip(
@@ -137,12 +140,13 @@
                     :items="positionList"
                     item-text="internalName"
                     item-value="id"
-                    :flat="flat.positionId"
+                    :flat="!currentCard.positionIdEditing"
                     solo
                     dense
                     hide-details="auto"
-                    @focus="flat.positionId = false"
-                    @blur="update('positionId')"
+                    @focus="currentCard.positionIdEditing = true"
+                    @blur="currentCard.positionIdEditing = false"
+                    @input="update('positionId')"
                   )
                     template(v-slot:selection="{ item }")
                       v-chip(
@@ -290,86 +294,108 @@
                       :key="evaluation.id"
                     )
                       v-container.pa-5
-                        v-row(dense)
-                          v-col.py-2.grey--text(cols="2") 面接官
-                          v-col.py-0(cols="10")
-                            v-autocomplete.body-2(
-                              v-model="evaluation.recruiterId"
-                              append-icon=""
-                              :items="recruiterList"
-                              item-text="nickname"
-                              item-value="id"
-                              :flat="!evaluation.recruiterIdEditing"
-                              solo
-                              dense
-                              hide-details="auto"
-                              @focus="evaluation.recruiterIdEditing = true"
-                              @blur="evaluation.recruiterIdEditing = false"
-                              @input="updateEvaluation(evaluation, 'recruiterId')"
-                            )
-                              template(v-slot:selection="{ item }")
-                                v-avatar.me-1(
-                                  color="grey"
-                                  size="18"
-                                )
-                                  span.white--text.subtitle-2 {{ item.nickname[0] }}
-                                span.subtitle-2 {{ item.nickname }}
-                              template(v-slot:item="{ item }")
-                                v-avatar.me-1(
-                                  color="grey"
-                                  size="18"
-                                )
-                                  span.white--text.subtitle-2 {{ item.nickname[0] }}
-                                span.subtitle-2 {{ item.nickname }}
-                        v-row(dense)
-                          v-col.py-2.grey--text(cols="2") 結果
-                          v-col.py-0(cols="10")
-                            v-autocomplete.body-2.grey--text(
-                              v-model="evaluation.result"
-                              append-icon=""
-                              :items="resultList"
-                              item-text="ja"
-                              item-value="en"
-                              placeholder="未入力"
-                              :flat="!evaluation.resultEditing"
-                              solo
-                              dense
-                              hide-details="auto"
-                              @focus="evaluation.resultEditing = true"
-                              @blur="evaluation.resultEditing = false"
-                              @input="updateEvaluation(evaluation, 'result')"
-                            )
-                        v-row(dense)
-                          v-col.py-2.grey--text(cols="2") 入力日
-                          v-col.py-0(cols="10")
-                            v-menu(
-                              v-model="evaluation.inputAtEditing"
-                              :close-on-content-click="false"
-                              offset-y
-                              min-width="auto"
-                            )
-                              template(v-slot:activator="{ on, attrs }")
-                                v-text-field.body-2(
-                                  :value="evaluation.inputAt ? $dateFns.format(evaluation.inputAtToDate, 'yyyy.MM.dd') : null"
-                                  placeholder="未入力"
-                                  hide-details="auto"
-                                  :flat="!evaluation.inputAtEditing"
+                        .d-flex
+                          .flex-grow-1
+                            v-row(dense)
+                              v-col.py-2.grey--text(cols="2") 面接官
+                              v-col.py-0(cols="10")
+                                v-autocomplete.body-2(
+                                  v-model="evaluation.recruiterId"
+                                  append-icon=""
+                                  :items="recruiterList"
+                                  item-text="nickname"
+                                  item-value="id"
+                                  :flat="!evaluation.recruiterIdEditing"
                                   solo
                                   dense
-                                  readonly
-                                  v-bind="attrs"
-                                  v-on="on"
+                                  hide-details="auto"
+                                  @focus="evaluation.recruiterIdEditing = true"
+                                  @blur="evaluation.recruiterIdEditing = false"
+                                  @input="updateEvaluation(evaluation, 'recruiterId')"
                                 )
-                              v-date-picker(
-                                v-model="evaluation.inputAt"
-                                no-title
-                                @input="updateEvaluation(evaluation, 'inputAt')"
+                                  template(v-slot:selection="{ item }")
+                                    v-avatar.me-1(
+                                      color="grey"
+                                      size="18"
+                                    )
+                                      span.white--text.subtitle-2 {{ item.nickname[0] }}
+                                    span.subtitle-2 {{ item.nickname }}
+                                  template(v-slot:item="{ item }")
+                                    v-avatar.me-1(
+                                      color="grey"
+                                      size="18"
+                                    )
+                                      span.white--text.subtitle-2 {{ item.nickname[0] }}
+                                    span.subtitle-2 {{ item.nickname }}
+                            v-row(dense)
+                              v-col.py-2.grey--text(cols="2") 結果
+                              v-col.py-0(cols="10")
+                                v-autocomplete.body-2.grey--text(
+                                  v-model="evaluation.result"
+                                  append-icon=""
+                                  :items="resultList"
+                                  item-text="ja"
+                                  item-value="en"
+                                  placeholder="未入力"
+                                  :flat="!evaluation.resultEditing"
+                                  solo
+                                  dense
+                                  hide-details="auto"
+                                  @focus="evaluation.resultEditing = true"
+                                  @blur="evaluation.resultEditing = false"
+                                  @input="updateEvaluation(evaluation, 'result')"
+                                )
+                            v-row(dense)
+                              v-col.py-2.grey--text(cols="2") 入力日
+                              v-col.py-0(cols="10")
+                                v-menu(
+                                  v-model="evaluation.inputAtEditing"
+                                  :close-on-content-click="false"
+                                  offset-y
+                                  min-width="auto"
+                                )
+                                  template(v-slot:activator="{ on, attrs }")
+                                    v-text-field.body-2(
+                                      :value="evaluation.inputAt ? $dateFns.format(evaluation.inputAtToDate, 'yyyy.MM.dd') : null"
+                                      placeholder="未入力"
+                                      hide-details="auto"
+                                      :flat="!evaluation.inputAtEditing"
+                                      solo
+                                      dense
+                                      readonly
+                                      v-bind="attrs"
+                                      v-on="on"
+                                    )
+                                  v-date-picker(
+                                    v-model="evaluation.inputAt"
+                                    no-title
+                                    @focus="evaluation.inputAtEditing = true"
+                                    @input="updateEvaluation(evaluation, 'inputAt')"
+                                  )
+                          v-menu(
+                            offset-y
+                            left
+                          )
+                            template(v-slot:activator="{ on, attrs }")
+                              v-btn(
+                                icon
+                                tile
+                                v-bind="attrs"
+                                v-on="on"
                               )
+                                v-icon mdi-dots-vertical
+                            v-list(dense)
+                              v-list-item(
+                                link
+                                @click="deleteEvaluation(evaluation)"
+                              )
+                                v-list-item-title 選考評価を削除
                         .mt-3 {{ evaluation.description }}
-                    v-card.mt-3(
+                    v-card(
                       v-if="(!history.result || !history.selectedAt) && !history.autoSchedulingToken"
                       outlined
                       link
+                      :class="{ 'mt-3': history.recruitmentEvaluations.length > 0 }"
                     )
                       v-autocomplete.body-2.pa-3(
                         v-model="newEvaluation.recruiterId"
@@ -426,13 +452,6 @@ export default {
       dialog: false,
       currentCard: null,
       resultList,
-      flat: {
-        recruitmentSelectionId: true,
-        recruiterId: true,
-        channelId: true,
-        positionId: true,
-        result: true,
-      },
       newEvaluation: {
         recruiterId: null,
       },
@@ -467,7 +486,7 @@ export default {
         { candidate }
       )
       Candidate.update({ data })
-      this.flat[field] = true
+      this.currentCard[`${field}Editing`] = false
     },
     async deleteCandidate() {
       const isDelete = await confirm('本当に削除してよろしいですか？')
@@ -521,7 +540,7 @@ export default {
         `/recruitment_histories/${historyId}/recruitment_evaluations`,
         { evaluation: { recruiter_id: recruiterId } }
       )
-      RecruitmentHistory.insert({ data, insert: ['recruitmentEvaluation'] })
+      RecruitmentEvaluation.insert({ data })
       this.newEvaluation.recruiterId = null
       this.$nextTick(function () {
         this.$refs[`newEvaluation${historyId}`][0].blur()
@@ -542,6 +561,16 @@ export default {
       )
       RecruitmentEvaluation.update({ data })
       currentEvaluation[`${field}Editing`] = false
+      this.refreshCurrentCard()
+    },
+    async deleteEvaluation(currentEvaluation) {
+      const isDelete = await confirm('本当に削除してよろしいですか？')
+      if (!isDelete) return
+
+      const { data } = await this.$axios.delete(
+        `/recruitment_histories/${currentEvaluation.recruitmentHistoryId}/recruitment_evaluations/${currentEvaluation.id}`
+      )
+      RecruitmentEvaluation.delete(data.id)
       this.refreshCurrentCard()
     },
     refreshCurrentCard() {
