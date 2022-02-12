@@ -3,7 +3,11 @@ v-card.pt-8.pb-16.mx-auto(
   max-width="480"
   flat
 )
-  v-form
+  v-form(
+    v-model="valid.apply"
+    lazy-validation
+    ref="applyForm"
+  )
     v-card-text
       .text-h5.font-weight-bold.mb-5 候補者推薦フォーム
       .text-h6.font-weight-bold.mb-2 候補者情報
@@ -16,6 +20,7 @@ v-card.pt-8.pb-16.mx-auto(
             outlined
             hide-details="auto"
             placeholder="姓"
+            :rules="[required]"
           )
         v-col(cols="6")
           v-text-field.body-2(
@@ -24,6 +29,7 @@ v-card.pt-8.pb-16.mx-auto(
             outlined
             hide-details="auto"
             placeholder="名"
+            :rules="[required]"
           )
       .grey--text.mb-1 応募ポジション
       v-autocomplete.body-2.mb-3(
@@ -35,6 +41,7 @@ v-card.pt-8.pb-16.mx-auto(
         outlined
         hide-details="auto"
         placeholder="未選択"
+        :rules="[required]"
       )
       .grey--text.mb-1 レジュメ
       v-file-input.body-2.mb-3(
@@ -44,8 +51,10 @@ v-card.pt-8.pb-16.mx-auto(
         multiple
         small-chips
         show-size
+        accept="image/jpeg, image/jpg, image/png, application/pdf"
         hide-details="auto"
         placeholder="未入力"
+        :rules="[required]"
       )
       .grey--text.mb-1 推薦文
       v-textarea.body-2(
@@ -76,6 +85,7 @@ v-card.pt-8.pb-16.mx-auto(
             outlined
             hide-details="auto"
             placeholder="姓"
+            :rules="[required]"
           )
         v-col(cols="6")
           v-text-field.body-2(
@@ -84,6 +94,7 @@ v-card.pt-8.pb-16.mx-auto(
             outlined
             hide-details="auto"
             placeholder="名"
+            :rules="[required]"
           )
       .grey--text.mb-1 紹介者のメールアドレス
       v-text-field.body-2.mb-5(
@@ -92,6 +103,7 @@ v-card.pt-8.pb-16.mx-auto(
         dense
         outlined
         hide-details="auto"
+        :rules="[required, valid_email]"
       )
       v-btn(
         block
@@ -127,10 +139,16 @@ export default {
         agentLastName: '',
         agentEmail: '',
       },
+      valid: {
+        apply: true,
+      },
     }
   },
   methods: {
     async apply() {
+      await this.$refs.applyForm.validate()
+      if (!this.valid.apply) return
+
       const orgId = this.$route.params.organization_id
       this.$axios.post(`/${orgId}/applies`, this.applyParams, {
         'Content-Type': 'multipart/form-data',
@@ -156,6 +174,15 @@ export default {
     },
     channel() {
       return Channel.query().first()
+    },
+    required() {
+      return (v) => !!v || '必ず入力してください'
+    },
+    valid_email() {
+      const EMAIL_REGEXP =
+        /^[a-zA-Z0-9.!\#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+      return (v) =>
+        EMAIL_REGEXP.test(v) || '正しいメールアドレスを入力してください'
     },
     applyParams() {
       const params = new FormData()
