@@ -1,4 +1,5 @@
 import { Model } from '@vuex-orm/core'
+import Candidate from './Candidate'
 import RecruitmentEvaluation from './RecruitmentEvaluation'
 import RecruitmentSelection from './RecruitmentSelection'
 
@@ -22,9 +23,16 @@ export default class RecruitmentHistory extends Model {
         RecruitmentSelection,
         'recruitmentSelectionId'
       ),
+      candidate: this.belongsTo(Candidate, 'candidateId'),
       selectedAtEditing: this.boolean(false),
       resultEditing: this.boolean(false),
     }
+  }
+
+  get isSelectiveType() {
+    return ['document', 'interview'].includes(
+      this.recruitmentSelection.selectionType
+    )
   }
 
   get selectedAtToDate() {

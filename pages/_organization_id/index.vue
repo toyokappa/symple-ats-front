@@ -422,7 +422,7 @@
                                 v-list-item-title 選考評価を削除
                         .mt-3 {{ evaluation.description }}
                     v-card(
-                      v-if="(!history.result || !history.selectedAt) && !history.autoSchedulingToken"
+                      v-if="history.isSelectiveType && (!history.result || !history.selectedAt) && !history.autoSchedulingToken"
                       outlined
                       link
                       :class="{ 'mt-3': history.recruitmentEvaluations.length > 0 }"
@@ -536,8 +536,9 @@ export default {
         `/candidates/${this.currentCard.id}`,
         { candidate }
       )
-      Candidate.update({ data })
+      Candidate.update({ data, insertOrUpdate: ['recruitmentHistories'] })
       this.currentCard[`${field}Editing`] = false
+      this.refreshCurrentCard()
     },
     async deleteCandidate() {
       const isDelete = await confirm('本当に削除してよろしいですか？')
@@ -582,7 +583,7 @@ export default {
         `/recruitment_histories/${currentHistory.id}`,
         { history }
       )
-      RecruitmentHistory.update({ data })
+      RecruitmentHistory.update({ data, update: ['candidate'] })
       currentHistory[`${field}Editing`] = false
       this.refreshCurrentCard()
     },

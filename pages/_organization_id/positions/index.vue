@@ -70,16 +70,18 @@
                   v-model="addPosition.internalName"
                   placeholder="内部管理名"
                   :rules="internalNameRules"
+                  hide-details="auto"
                 )
               v-col(cols="8")
                 v-text-field.body-2(
                   v-model="addPosition.externalName"
                   placeholder="外部公開名"
                   :rules="externalNameRules"
+                  hide-details="auto"
                   append-outer-icon="mdi-delete"
                   @click:append-outer="remove"
                 )
-            .mb-3
+            .mt-5
               .d-flex.align-center.justify-space-between
                 v-btn(
                   text

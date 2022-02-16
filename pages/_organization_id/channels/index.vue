@@ -77,6 +77,7 @@
                   v-model="addChannel.name"
                   :rules="nameRules"
                   placeholder="チャネル名"
+                  hide-details="auto"
                 )
               v-col(cols="6")
                 v-autocomplete.body-2(
@@ -86,10 +87,11 @@
                   item-text="ja"
                   item-value="en"
                   placeholder="チャネル種別"
+                  hide-details="auto"
                   append-outer-icon="mdi-delete"
-                  @click:append-outer="remove"
+                  @click:append-outer="remove(index)"
                 )
-            .mb-3
+            .mt-5
               .d-flex.align-center.justify-space-between
                 v-btn(
                   text
