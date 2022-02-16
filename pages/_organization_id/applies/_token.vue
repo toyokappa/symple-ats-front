@@ -170,7 +170,7 @@ export default {
   },
   computed: {
     positionList() {
-      return Position.all()
+      return Position.query().where('status', 'open').get()
     },
     channel() {
       return Channel.query().first()
